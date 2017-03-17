@@ -1,5 +1,7 @@
 require 'rake'
 require 'fakefs/spec_helpers'
+require 'active_support'
+require 'active_support/core_ext/string/inflections.rb'
 
 shared_context :rake do
   include ::Rake::DSL if defined?(::Rake::DSL)
