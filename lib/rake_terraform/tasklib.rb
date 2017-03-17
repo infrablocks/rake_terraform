@@ -82,7 +82,7 @@ module RakeTerraform
       end
 
       def apply_default_to(instance)
-        instance.__send__(writer_method, @default) if @default
+        instance.__send__(writer_method, @default) unless @default.nil?
       end
 
       def dissatisfied_by?(instance)

@@ -65,6 +65,7 @@ describe RakeTerraform::Tasks::Provision do
       t.configuration_directory = 'infra/network'
     end
 
+    stub_puts
     stub_ruby_terraform
 
     expect(RubyTerraform).to(receive(:clean))
@@ -80,11 +81,45 @@ describe RakeTerraform::Tasks::Provision do
       t.configuration_directory = configuration_directory
     end
 
+    stub_puts
     stub_ruby_terraform
 
     expect(RubyTerraform)
         .to(receive(:get)
-                .with(directory: configuration_directory))
+                .with(hash_including(directory: configuration_directory)))
+
+    Rake::Task['provision'].invoke
+  end
+
+  it 'passes a no_color parameter of false to get by default' do
+    subject.new do |t|
+      t.configuration_name = 'network'
+      t.configuration_directory = 'infra/network'
+    end
+
+    stub_puts
+    stub_ruby_terraform
+
+    expect(RubyTerraform)
+        .to(receive(:get)
+                .with(hash_including(no_color: false)))
+
+    Rake::Task['provision'].invoke
+  end
+
+  it 'passes the provided value for the no_color parameter to get when present' do
+    subject.new do |t|
+      t.configuration_name = 'network'
+      t.configuration_directory = 'infra/network'
+      t.no_color = true
+    end
+
+    stub_puts
+    stub_ruby_terraform
+
+    expect(RubyTerraform)
+        .to(receive(:get)
+                .with(hash_including(no_color: true)))
 
     Rake::Task['provision'].invoke
   end
@@ -103,11 +138,63 @@ describe RakeTerraform::Tasks::Provision do
       t.backend_config = backend_config
     end
 
+    stub_puts
     stub_ruby_terraform
 
     expect(RubyTerraform)
         .to(receive(:remote_config)
-                .with(backend: backend, backend_config: backend_config))
+                .with(hash_including(
+                          backend: backend,
+                          backend_config: backend_config)))
+
+    Rake::Task['provision'].invoke
+  end
+
+  it 'passes a no_color parameter of false to remote config by default' do
+    backend = 's3'
+    backend_config = {
+        bucket: 'some-bucket',
+        key: 'some-key.tfstate',
+        region: 'eu-west-2'
+    }
+    subject.new do |t|
+      t.configuration_name = 'network'
+      t.configuration_directory = 'infra/network'
+      t.backend = backend
+      t.backend_config = backend_config
+    end
+
+    stub_puts
+    stub_ruby_terraform
+
+    expect(RubyTerraform)
+        .to(receive(:remote_config)
+                .with(hash_including(no_color: false)))
+
+    Rake::Task['provision'].invoke
+  end
+
+  it 'passes the provided value for the no_color parameter to remote config when present' do
+    backend = 's3'
+    backend_config = {
+        bucket: 'some-bucket',
+        key: 'some-key.tfstate',
+        region: 'eu-west-2'
+    }
+    subject.new do |t|
+      t.configuration_name = 'network'
+      t.configuration_directory = 'infra/network'
+      t.backend = backend
+      t.backend_config = backend_config
+      t.no_color = true
+    end
+
+    stub_puts
+    stub_ruby_terraform
+
+    expect(RubyTerraform)
+        .to(receive(:remote_config)
+                .with(hash_including(no_color: true)))
 
     Rake::Task['provision'].invoke
   end
@@ -118,6 +205,7 @@ describe RakeTerraform::Tasks::Provision do
       t.configuration_directory = 'infra/network'
     end
 
+    stub_puts
     stub_ruby_terraform
 
     expect(RubyTerraform).not_to(receive(:remote_config))
@@ -133,6 +221,7 @@ describe RakeTerraform::Tasks::Provision do
       t.configuration_directory = configuration_directory
     end
 
+    stub_puts
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -154,6 +243,7 @@ describe RakeTerraform::Tasks::Provision do
       t.vars = vars
     end
 
+    stub_puts
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -181,6 +271,7 @@ describe RakeTerraform::Tasks::Provision do
       end
     end
 
+    stub_puts
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -191,6 +282,151 @@ describe RakeTerraform::Tasks::Provision do
                 })))
 
     Rake::Task['provision'].invoke
+  end
+
+  it 'uses the provided state file when present' do
+    state_file = 'some/state.tfstate'
+
+    subject.new do |t|
+      t.configuration_name = 'network'
+      t.configuration_directory = 'infra/network'
+
+      t.state_file = state_file
+    end
+
+    stub_puts
+    stub_ruby_terraform
+
+    expect(RubyTerraform)
+        .to(receive(:apply)
+                .with(hash_including(state: state_file)))
+
+    Rake::Task['provision'].invoke
+  end
+
+  it 'throws an ArgumentError if both backend and state file are provided' do
+    expect {
+      subject.new do |t|
+        t.configuration_name = 'network'
+        t.configuration_directory = 'infra/network'
+
+        t.state_file = 'some/state.tfstate'
+
+        t.backend = 's3'
+        t.backend_config = {
+            bucket: 'some-bucket'
+        }
+      end
+    }.to raise_error(
+             ArgumentError,
+             "Only one of 'state_file' and 'backend' can be provided.")
+  end
+
+  it 'passes a no_color parameter of false to apply by default' do
+    subject.new do |t|
+      t.configuration_name = 'network'
+      t.configuration_directory = 'infra/network'
+    end
+
+    stub_puts
+    stub_ruby_terraform
+
+    expect(RubyTerraform)
+        .to(receive(:apply)
+                .with(hash_including(no_color: false)))
+
+    Rake::Task['provision'].invoke
+  end
+
+  it 'passes the provided value for the no_color parameter to apply when present' do
+    subject.new do |t|
+      t.configuration_name = 'network'
+      t.configuration_directory = 'infra/network'
+      t.no_color = true
+    end
+
+    stub_puts
+    stub_ruby_terraform
+
+    expect(RubyTerraform)
+        .to(receive(:apply)
+                .with(hash_including(no_color: true)))
+
+    Rake::Task['provision'].invoke
+  end
+
+  it 'passes a no_backup parameter of false to apply by default' do
+    subject.new do |t|
+      t.configuration_name = 'network'
+      t.configuration_directory = 'infra/network'
+    end
+
+    stub_puts
+    stub_ruby_terraform
+
+    expect(RubyTerraform)
+        .to(receive(:apply)
+                .with(hash_including(no_backup: false)))
+
+    Rake::Task['provision'].invoke
+  end
+
+  it 'passes the provided value for the no_backup parameter to apply when present' do
+    subject.new do |t|
+      t.configuration_name = 'network'
+      t.configuration_directory = 'infra/network'
+
+      t.no_backup = true
+    end
+
+    stub_puts
+    stub_ruby_terraform
+
+    expect(RubyTerraform)
+        .to(receive(:apply)
+                .with(hash_including(no_backup: true)))
+
+    Rake::Task['provision'].invoke
+  end
+
+  it 'passes a backup parameter of nil to apply by default' do
+    subject.new do |t|
+      t.configuration_name = 'network'
+      t.configuration_directory = 'infra/network'
+    end
+
+    stub_puts
+    stub_ruby_terraform
+
+    expect(RubyTerraform)
+        .to(receive(:apply)
+                .with(hash_including(backup: nil)))
+
+    Rake::Task['provision'].invoke
+  end
+
+  it 'passes the provided backup_file value for the backup parameter to apply when present' do
+    backup_file = 'some/state.tfstate.backup'
+
+    subject.new do |t|
+      t.configuration_name = 'network'
+      t.configuration_directory = 'infra/network'
+
+      t.backup_file = backup_file
+    end
+
+    stub_puts
+    stub_ruby_terraform
+
+    expect(RubyTerraform)
+        .to(receive(:apply)
+                .with(hash_including(backup: backup_file)))
+
+    Rake::Task['provision'].invoke
+  end
+
+  def stub_puts
+    allow_any_instance_of(Kernel).to(receive(:puts))
   end
 
   def stub_ruby_terraform
