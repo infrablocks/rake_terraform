@@ -20,6 +20,8 @@ module RakeTerraform
 
       parameter :backup_file
 
+      parameter :ensure_task, :default => :'terraform:ensure'
+
       def process_arguments(args)
         self.name = args[0] if args[0]
       end
@@ -31,7 +33,7 @@ module RakeTerraform
         end
 
         desc "Provision #{configuration_name} using terraform"
-        task name do
+        task name => [ensure_task] do
           apply_vars = vars.respond_to?(:call) ?
             vars.call(
                 configuration_name: configuration_name,

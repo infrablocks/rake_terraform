@@ -4,6 +4,12 @@ require 'spec_helper'
 describe RakeTerraform::Tasks::Provision do
   include_context :rake
 
+  before(:each) do
+    namespace :terraform do
+      task :ensure
+    end
+  end
+
   it 'adds a provision task in the namespace in which it is created' do
     namespace :infrastructure do
       subject.new do |t|
@@ -57,6 +63,38 @@ describe RakeTerraform::Tasks::Provision do
 
     expect(infra1_provision).not_to be_nil
     expect(infra2_provision).not_to be_nil
+  end
+
+  it 'depends on the terraform:ensure task by default' do
+    namespace :infrastructure do
+      subject.new(:provision_network) do |t|
+        t.configuration_name = 'network'
+        t.configuration_directory = 'infra/network'
+      end
+    end
+
+    expect(Rake::Task['infrastructure:provision_network'].prerequisite_tasks)
+        .to(include(Rake::Task['terraform:ensure']))
+  end
+
+  it 'depends on the provided task if specified' do
+    namespace :tools do
+      namespace :terraform do
+        task :ensure
+      end
+    end
+
+    namespace :infrastructure do
+      subject.new(:provision_network) do |t|
+        t.configuration_name = 'network'
+        t.configuration_directory = 'infra/network'
+
+        t.ensure_task = 'tools:terraform:ensure'
+      end
+    end
+
+    expect(Rake::Task['infrastructure:provision_network'].prerequisite_tasks)
+        .to(include(Rake::Task['tools:terraform:ensure']))
   end
 
   it 'cleans the terraform state directory' do
