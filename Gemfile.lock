@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rake-terraform (0.1.0)
+    rake_terraform (0.1.0)
       ruby-terraform (~> 0.4)
 
 GEM
@@ -55,7 +55,7 @@ DEPENDENCIES
   fakefs (~> 0.10)
   gem-release (~> 0.7)
   rake (~> 11.0)
-  rake-terraform!
+  rake_terraform!
   rspec (~> 3.0)
 
 BUNDLED WITH

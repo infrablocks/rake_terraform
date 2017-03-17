@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'rake_terraform/version'
 
 Gem::Specification.new do |spec|
-  spec.name = 'rake-terraform'
+  spec.name = 'rake_terraform'
   spec.version = RakeTerraform::VERSION
   spec.authors = ['Toby Clemson']
   spec.email = ['tobyclemson@gmail.com']
