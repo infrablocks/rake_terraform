@@ -8,8 +8,288 @@ describe RakeTerraform::Tasks::All do
       define_tasks
     end
 
+    expect(Rake::Task['network:plan']).not_to be_nil
     expect(Rake::Task['network:provision']).not_to be_nil
     expect(Rake::Task['network:destroy']).not_to be_nil
+  end
+
+  context 'plan task' do
+    it 'configures with the provided configuration name and directory' do
+      configuration_name = 'network'
+      configuration_directory = 'infra/network'
+
+      plan_configurer = stubbed_plan_configurer
+
+      expect(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:configuration_name=).with(configuration_name))
+      expect(plan_configurer)
+          .to(receive(:configuration_directory=).with(configuration_directory))
+
+      namespace :network do
+        define_tasks do |t|
+          t.configuration_name = configuration_name
+          t.configuration_directory = configuration_directory
+        end
+      end
+    end
+
+    it 'passes backend configuration when present' do
+      backend = 's3'
+      backend_config = {
+          bucket: 'some-bucket'
+      }
+
+      plan_configurer = stubbed_plan_configurer
+
+      allow(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:backend=).with(backend))
+      expect(plan_configurer)
+          .to(receive(:backend_config=).with(backend_config))
+
+      namespace :network do
+        define_tasks do |t|
+          t.backend = backend
+          t.backend_config = backend_config
+        end
+      end
+    end
+
+    it 'passes nil for backend when no backend configuration present' do
+      plan_configurer = stubbed_plan_configurer
+
+      allow(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:backend=).with(nil))
+      expect(plan_configurer)
+          .to(receive(:backend_config=).with(nil))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
+    it 'passes vars when present' do
+      vars = {
+          vpc_id: '1234',
+          domain_name: 'example.com'
+      }
+
+      plan_configurer = stubbed_plan_configurer
+
+      allow(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:vars=).with(vars))
+
+      namespace :network do
+        define_tasks do |t|
+          t.vars = vars
+        end
+      end
+    end
+
+    it 'passes nil for vars when no vars present' do
+      plan_configurer = stubbed_plan_configurer
+
+      allow(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:vars=).with(nil))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
+    it 'passes state file when present' do
+      state_file = 'infra/terraform.tfstate'
+
+      plan_configurer = stubbed_plan_configurer
+
+      allow(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:state_file=).with(state_file))
+
+      namespace :network do
+        define_tasks do |t|
+          t.state_file = state_file
+        end
+      end
+    end
+
+    it 'passes nil for state file when no state file present' do
+      plan_configurer = stubbed_plan_configurer
+
+      allow(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:state_file=).with(nil))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
+    it 'passes plan file when present' do
+      plan_file = 'infra/terraform.tfplan'
+
+      plan_configurer = stubbed_plan_configurer
+
+      allow(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:plan_file=).with(plan_file))
+
+      namespace :network do
+        define_tasks do |t|
+          t.plan_file = plan_file
+        end
+      end
+    end
+
+    it 'passes nil for plan file when no plan file present' do
+      plan_configurer = stubbed_plan_configurer
+
+      allow(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:plan_file=).with(nil))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
+    it 'passes supplied value for no_color when provided' do
+      no_color = true
+
+      plan_configurer = stubbed_plan_configurer
+
+      allow(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:no_color=).with(no_color))
+
+      namespace :network do
+        define_tasks do |t|
+          t.no_color = no_color
+        end
+      end
+    end
+
+    it 'passes false for no_color by default' do
+      plan_configurer = stubbed_plan_configurer
+
+      allow(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:no_color=).with(false))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
+    it 'passes provided ensure task when present' do
+      ensure_task = :'tooling:terraform:ensure'
+
+      plan_configurer = stubbed_plan_configurer
+
+      allow(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:ensure_task=).with(ensure_task))
+
+      namespace :network do
+        define_tasks do |t|
+          t.ensure_task = ensure_task
+        end
+      end
+    end
+
+    it 'passes terraform:ensure for ensure task by default' do
+      plan_configurer = stubbed_plan_configurer
+
+      allow(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:ensure_task=).with(:'terraform:ensure'))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
+    it 'uses a name of plan by default' do
+      plan_configurer = stubbed_plan_configurer
+
+      expect(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:name=).with(:plan))
+
+      define_tasks
+    end
+
+    it 'uses the provided name when supplied' do
+      plan_configurer = stubbed_plan_configurer
+
+      expect(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:name=).with(:prepare_the_plans))
+
+      define_tasks do |t|
+        t.plan_task_name = :prepare_the_plans
+      end
+    end
+
+    it 'passes the provided argument names when supplied' do
+      plan_configurer = stubbed_plan_configurer
+
+      expect(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:argument_names=).with([:deployment_identifier, :region]))
+
+      define_tasks do |t|
+        t.plan_argument_names = [:deployment_identifier, :region]
+      end
+    end
+
+    it 'passes the provided argument names when supplied' do
+      plan_configurer = stubbed_plan_configurer
+
+      expect(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:argument_names=).with([:deployment_identifier, :region]))
+
+      define_tasks do |t|
+        t.argument_names = [:deployment_identifier, :region]
+      end
+    end
+
+    it 'gives preference to the plan argument names when argument names ' +
+           'also provided' do
+      plan_configurer = stubbed_plan_configurer
+
+      expect(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:argument_names=).with([:deployment_identifier]))
+
+      define_tasks do |t|
+        t.argument_names = [:deployment_identifier, :region]
+        t.plan_argument_names = [:deployment_identifier]
+      end
+    end
   end
 
   context 'provision task' do
@@ -644,6 +924,15 @@ describe RakeTerraform::Tasks::All do
       allow(instance).to(receive(message))
     end
     instance
+  end
+
+  def stubbed_plan_configurer
+    double_allowing(
+        :name=, :argument_names=, :backend=, :backend_config=,
+        :configuration_name=, :configuration_directory=,
+        :vars=, :state_file=,
+        :no_color=, :plan_file=, :destroy=,
+        :ensure_task=)
   end
 
   def stubbed_provision_configurer
