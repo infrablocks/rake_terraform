@@ -12,6 +12,24 @@ RSpec.describe RakeTerraform do
                 :clean, :get, :apply, :destroy, :remote_config, :output))
   end
 
+  context 'define_command_tasks' do
+    context 'when instantiating RakeTerraform::Tasks::All' do
+      it 'passes the provided block' do
+        block = lambda do |t|
+          t.configuration_name = 'network'
+          t.configuration_directory = 'infra/network'
+        end
+
+        expect(RakeTerraform::Tasks::All)
+            .to(receive(:new) do |*_, &passed_block|
+              expect(passed_block).to(eq(block))
+            end)
+
+        RakeTerraform.define_command_tasks(&block)
+      end
+    end
+  end
+
   context 'define_installation_tasks' do
     context 'when configuring RubyTerraform' do
       it 'sets the binary using a path of vendor/terraform by default' do
@@ -203,27 +221,29 @@ RSpec.describe RakeTerraform do
     end
   end
 
+  def double_allowing(*messages)
+    instance = double
+    messages.each do |message|
+      allow(instance).to(receive(message))
+    end
+    instance
+  end
+
   def stubbed_ruby_terraform_config
-    config = double('Config')
-
-    allow(config).to(receive(:binary=))
-
-    config
+    double_allowing(:binary=)
   end
 
   def stubbed_rake_dependencies_all_task
-    task = double('Task')
+    double_allowing(
+        :namespace=, :dependency=, :version=, :path=, :type=, :os_ids=,
+        :uri_template=, :file_name_template=, :needs_fetch=)
+  end
 
-    allow(task).to(receive(:namespace=))
-    allow(task).to(receive(:dependency=))
-    allow(task).to(receive(:version=))
-    allow(task).to(receive(:path=))
-    allow(task).to(receive(:type=))
-    allow(task).to(receive(:os_ids=))
-    allow(task).to(receive(:uri_template=))
-    allow(task).to(receive(:file_name_template=))
-    allow(task).to(receive(:needs_fetch=))
-
-    task
+  def stubbed_rake_terraform_all_task
+    double_allowing(
+        :configuration_name=, :configuration_directory=,
+        :backend=, :backend_config=, :vars=, :state_file=,
+        :no_color=, :no_backup=, :backup=,
+        :ensure_task=, :provision_task_name=, :destroy_task_name=)
   end
 end

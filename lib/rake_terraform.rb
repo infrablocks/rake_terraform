@@ -6,6 +6,10 @@ require 'rake_terraform/tasks'
 module RakeTerraform
   include RubyTerraform
 
+  def self.define_command_tasks(&block)
+    RakeTerraform::Tasks::All.new(&block)
+  end
+
   def self.define_installation_tasks(opts = {})
     RubyTerraform.configure do |c|
       c.binary = File.join(

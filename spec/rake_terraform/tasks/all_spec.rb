@@ -3,41 +3,6 @@ require 'spec_helper'
 describe RakeTerraform::Tasks::All do
   include_context :rake
 
-  def define_tasks(&block)
-    subject.new do |t|
-      t.configuration_name = 'network'
-      t.configuration_directory = 'infra/network'
-
-      block.call(t) if block
-    end
-  end
-
-  def double_allowing(*messages)
-    instance = double
-    messages.each do |message|
-      allow(instance).to(receive(message))
-    end
-    instance
-  end
-
-  def stubbed_provision_configurer
-    double_allowing(
-        :name=, :backend=, :backend_config=,
-        :configuration_name=, :configuration_directory=,
-        :vars=, :state_file=,
-        :no_color=, :no_backup=, :backup_file=,
-        :ensure_task=)
-  end
-
-  def stubbed_destroy_configurer
-    double_allowing(
-        :name=, :backend=, :backend_config=,
-        :configuration_name=, :configuration_directory=,
-        :vars=, :state_file=,
-        :no_color=, :no_backup=, :backup_file=,
-        :ensure_task=)
-  end
-
   it 'adds all command tasks in the namespace in which it is defined' do
     namespace :network do
       define_tasks
@@ -581,5 +546,40 @@ describe RakeTerraform::Tasks::All do
         t.destroy_task_name = :deploy
       end
     end
+  end
+
+  def define_tasks(&block)
+    subject.new do |t|
+      t.configuration_name = 'network'
+      t.configuration_directory = 'infra/network'
+
+      block.call(t) if block
+    end
+  end
+
+  def double_allowing(*messages)
+    instance = double
+    messages.each do |message|
+      allow(instance).to(receive(message))
+    end
+    instance
+  end
+
+  def stubbed_provision_configurer
+    double_allowing(
+        :name=, :backend=, :backend_config=,
+        :configuration_name=, :configuration_directory=,
+        :vars=, :state_file=,
+        :no_color=, :no_backup=, :backup_file=,
+        :ensure_task=)
+  end
+
+  def stubbed_destroy_configurer
+    double_allowing(
+        :name=, :backend=, :backend_config=,
+        :configuration_name=, :configuration_directory=,
+        :vars=, :state_file=,
+        :no_color=, :no_backup=, :backup_file=,
+        :ensure_task=)
   end
 end
