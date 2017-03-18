@@ -15,13 +15,20 @@ module RakeTerraform
 
       parameter :backup_file
 
+      parameter :argument_names
+
       parameter :ensure_task, :default => :'terraform:ensure'
+
       parameter :provision_task_name, :default => :provision
+      parameter :provision_argument_names
+
       parameter :destroy_task_name, :default => :destroy
+      parameter :destroy_argument_names
 
       def define
         Provision.new do |t|
           t.name = provision_task_name
+          t.argument_names = provision_argument_names || argument_names || []
 
           t.configuration_name = configuration_name
           t.configuration_directory = configuration_directory
@@ -41,6 +48,8 @@ module RakeTerraform
         end
         Destroy.new do |t|
           t.name = destroy_task_name
+          t.argument_names = destroy_argument_names || argument_names || []
+
 
           t.configuration_name = configuration_name
           t.configuration_directory = configuration_directory

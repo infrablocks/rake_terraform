@@ -67,13 +67,13 @@ describe RakeTerraform::Tasks::Provision do
 
   it 'depends on the terraform:ensure task by default' do
     namespace :infrastructure do
-      subject.new(:provision_network) do |t|
+      subject.new do |t|
         t.configuration_name = 'network'
         t.configuration_directory = 'infra/network'
       end
     end
 
-    expect(Rake::Task['infrastructure:provision_network'].prerequisite_tasks)
+    expect(Rake::Task['infrastructure:provision'].prerequisite_tasks)
         .to(include(Rake::Task['terraform:ensure']))
   end
 
@@ -85,7 +85,7 @@ describe RakeTerraform::Tasks::Provision do
     end
 
     namespace :infrastructure do
-      subject.new(:provision_network) do |t|
+      subject.new do |t|
         t.configuration_name = 'network'
         t.configuration_directory = 'infra/network'
 
@@ -93,8 +93,24 @@ describe RakeTerraform::Tasks::Provision do
       end
     end
 
-    expect(Rake::Task['infrastructure:provision_network'].prerequisite_tasks)
+    expect(Rake::Task['infrastructure:provision'].prerequisite_tasks)
         .to(include(Rake::Task['tools:terraform:ensure']))
+  end
+
+  it 'configures the task with the provided arguments if specified' do
+    argument_names = [:deployment_identifier, :region]
+
+    namespace :infrastructure do
+      subject.new do |t|
+        t.argument_names = argument_names
+
+        t.configuration_name = 'network'
+        t.configuration_directory = 'infra/network'
+      end
+    end
+
+    expect(Rake::Task['infrastructure:provision'].arg_names)
+        .to(eq(argument_names))
   end
 
   it 'cleans the terraform state directory' do
@@ -186,6 +202,39 @@ describe RakeTerraform::Tasks::Provision do
                           backend_config: backend_config)))
 
     Rake::Task['provision'].invoke
+  end
+
+  it 'uses the provided remote backend config factory when supplied' do
+    subject.new do |t|
+      t.argument_names = [:bucket_name]
+
+      t.configuration_name = 'network'
+      t.configuration_directory = 'infra/network'
+
+      t.backend = 's3'
+      t.backend_config = lambda do |args, params|
+        {
+            bucket: args.bucket_name,
+            key: "#{params.configuration_name}.tfstate",
+            region: 'eu-west-2'
+        }
+      end
+    end
+
+    stub_puts
+    stub_ruby_terraform
+
+    expect(RubyTerraform)
+        .to(receive(:remote_config)
+                .with(hash_including(
+                          backend: 's3',
+                          backend_config: {
+                              bucket: 'bucket-from-args',
+                              key: 'network.tfstate',
+                              region: 'eu-west-2'
+                          })))
+
+    Rake::Task['provision'].invoke('bucket-from-args')
   end
 
   it 'passes a no_color parameter of false to remote config by default' do
@@ -293,6 +342,8 @@ describe RakeTerraform::Tasks::Provision do
 
   it 'uses the provided vars factory in the terraform apply call' do
     subject.new do |t|
+      t.argument_names = [:deployment_identifier]
+
       t.configuration_name = 'network'
       t.configuration_directory = 'infra/network'
 
@@ -301,10 +352,11 @@ describe RakeTerraform::Tasks::Provision do
           bucket: 'some-bucket'
       }
 
-      t.vars = lambda do |params|
+      t.vars = lambda do |args, params|
         {
-            configuration_name: params[:configuration_name],
-            state_bucket: params[:backend_config][:bucket]
+            deployment_identifier: args.deployment_identifier,
+            configuration_name: params.configuration_name,
+            state_bucket: params.backend_config[:bucket]
         }
       end
     end
@@ -315,11 +367,12 @@ describe RakeTerraform::Tasks::Provision do
     expect(RubyTerraform)
         .to(receive(:apply)
                 .with(hash_including(vars: {
+                    deployment_identifier: 'staging',
                     configuration_name: 'network',
                     state_bucket: 'some-bucket'
                 })))
 
-    Rake::Task['provision'].invoke
+    Rake::Task['provision'].invoke('staging')
   end
 
   it 'uses the provided state file when present' do

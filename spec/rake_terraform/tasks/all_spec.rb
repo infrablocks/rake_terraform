@@ -278,6 +278,47 @@ describe RakeTerraform::Tasks::All do
         t.provision_task_name = :deploy
       end
     end
+
+    it 'passes the provided argument names when supplied' do
+      provision_configurer = stubbed_provision_configurer
+
+      expect(RakeTerraform::Tasks::Provision)
+          .to(receive(:new).and_yield(provision_configurer))
+      expect(provision_configurer)
+          .to(receive(:argument_names=).with([:deployment_identifier, :region]))
+
+      define_tasks do |t|
+        t.provision_argument_names = [:deployment_identifier, :region]
+      end
+    end
+
+    it 'passes the provided argument names when supplied' do
+      provision_configurer = stubbed_provision_configurer
+
+      expect(RakeTerraform::Tasks::Provision)
+          .to(receive(:new).and_yield(provision_configurer))
+      expect(provision_configurer)
+          .to(receive(:argument_names=).with([:deployment_identifier, :region]))
+
+      define_tasks do |t|
+        t.argument_names = [:deployment_identifier, :region]
+      end
+    end
+
+    it 'gives preference to the provision argument names when argument names ' +
+           'also provided' do
+      provision_configurer = stubbed_provision_configurer
+
+      expect(RakeTerraform::Tasks::Provision)
+          .to(receive(:new).and_yield(provision_configurer))
+      expect(provision_configurer)
+          .to(receive(:argument_names=).with([:deployment_identifier]))
+
+      define_tasks do |t|
+        t.argument_names = [:deployment_identifier, :region]
+        t.provision_argument_names = [:deployment_identifier]
+      end
+    end
   end
 
   context 'destroy task' do
@@ -546,6 +587,46 @@ describe RakeTerraform::Tasks::All do
         t.destroy_task_name = :deploy
       end
     end
+
+    it 'passes the provided destroy argument names when supplied' do
+      destroy_configurer = stubbed_destroy_configurer
+
+      expect(RakeTerraform::Tasks::Destroy)
+          .to(receive(:new).and_yield(destroy_configurer))
+      expect(destroy_configurer)
+          .to(receive(:argument_names=).with([:deployment_identifier, :region]))
+
+      define_tasks do |t|
+        t.destroy_argument_names = [:deployment_identifier, :region]
+      end
+    end
+
+    it 'passes the provided argument names when supplied' do
+      destroy_configurer = stubbed_destroy_configurer
+
+      expect(RakeTerraform::Tasks::Destroy)
+          .to(receive(:new).and_yield(destroy_configurer))
+      expect(destroy_configurer)
+          .to(receive(:argument_names=).with([:deployment_identifier, :region]))
+
+      define_tasks do |t|
+        t.argument_names = [:deployment_identifier, :region]
+      end
+    end
+
+    it 'gives preference to the destroy argument names when argument names also provided' do
+      destroy_configurer = stubbed_destroy_configurer
+
+      expect(RakeTerraform::Tasks::Destroy)
+          .to(receive(:new).and_yield(destroy_configurer))
+      expect(destroy_configurer)
+          .to(receive(:argument_names=).with([:deployment_identifier]))
+
+      define_tasks do |t|
+        t.argument_names = [:deployment_identifier, :region]
+        t.destroy_argument_names = [:deployment_identifier]
+      end
+    end
   end
 
   def define_tasks(&block)
@@ -567,7 +648,7 @@ describe RakeTerraform::Tasks::All do
 
   def stubbed_provision_configurer
     double_allowing(
-        :name=, :backend=, :backend_config=,
+        :name=, :argument_names=, :backend=, :backend_config=,
         :configuration_name=, :configuration_directory=,
         :vars=, :state_file=,
         :no_color=, :no_backup=, :backup_file=,
@@ -576,7 +657,7 @@ describe RakeTerraform::Tasks::All do
 
   def stubbed_destroy_configurer
     double_allowing(
-        :name=, :backend=, :backend_config=,
+        :name=, :argument_names=, :backend=, :backend_config=,
         :configuration_name=, :configuration_directory=,
         :vars=, :state_file=,
         :no_color=, :no_backup=, :backup_file=,

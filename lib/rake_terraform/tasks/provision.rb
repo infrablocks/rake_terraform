@@ -1,10 +1,12 @@
 require 'ruby_terraform'
+require 'ostruct'
 require_relative '../tasklib'
 
 module RakeTerraform
   module Tasks
     class Provision < TaskLib
       parameter :name, :default => :provision
+      parameter :argument_names, :default => []
 
       parameter :configuration_name, :required => true
       parameter :configuration_directory, :required => true
@@ -33,18 +35,25 @@ module RakeTerraform
         end
 
         desc "Provision #{configuration_name} using terraform"
-        task name => [ensure_task] do
-          apply_vars = vars.respond_to?(:call) ?
-            vars.call(
-                configuration_name: configuration_name,
-                configuration_directory: configuration_directory,
-                backend: backend,
-                backend_config: backend_config,
-                state_file: state_file,
-                no_color: no_color,
-                no_backup: no_backup,
-                backup_file: backup_file) :
+        task name, argument_names => [ensure_task] do |_, args|
+          params = OpenStruct.new({
+              configuration_name: configuration_name,
+              configuration_directory: configuration_directory,
+              backend: backend,
+              backend_config: backend_config,
+              state_file: state_file,
+              no_color: no_color,
+              no_backup: no_backup,
+              backup_file: backup_file
+          })
+
+          derived_vars = vars.respond_to?(:call) ?
+            vars.call(*[args, params].slice(0, vars.arity)) :
             vars
+          derived_backend_config = backend_config.respond_to?(:call) ?
+            backend_config.call(
+                *[args, params].slice(0, backend_config.arity)) :
+            backend_config
 
           puts "Provisioning #{configuration_name}"
 
@@ -56,7 +65,7 @@ module RakeTerraform
             RubyTerraform.remote_config(
                 no_color: no_color,
                 backend: backend,
-                backend_config: backend_config)
+                backend_config: derived_backend_config)
           end
           RubyTerraform.apply(
               no_color: no_color,
@@ -64,7 +73,7 @@ module RakeTerraform
               backup: backup_file,
               directory: configuration_directory,
               state: state_file,
-              vars: apply_vars)
+              vars: derived_vars)
         end
       end
     end
