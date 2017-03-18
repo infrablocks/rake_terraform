@@ -44,7 +44,7 @@ module RakeTerraform
               .build
               .execute(stdout: version_string)
 
-          if version_string.string.lines.first =~ /#{version}/
+          if version_string.string.lines.first =~ /#{opts[:version]}/
             return false
           end
         end
