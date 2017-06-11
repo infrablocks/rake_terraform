@@ -1,4 +1,5 @@
 require 'rake_dependencies'
+require 'ruby_terraform'
 require 'rake_terraform/version'
 require 'rake_terraform/tasklib'
 require 'rake_terraform/tasks'
@@ -11,16 +12,18 @@ module RakeTerraform
   end
 
   def self.define_installation_tasks(opts = {})
+    namespace = opts[:namespace] || :terraform
+    version = opts[:version] || '0.9.0'
+    path = opts[:path] || File.join('vendor', 'terraform')
+
     RubyTerraform.configure do |c|
-      c.binary = File.join(
-          opts[:path] || File.join('vendor', 'terraform'),
-          'bin', 'terraform')
+      c.binary = File.join(path, 'bin', 'terraform')
     end
     RakeDependencies::Tasks::All.new do |t|
-      t.namespace = opts[:namespace] || :terraform
+      t.namespace = namespace
       t.dependency = 'terraform'
-      t.version = opts[:version] || '0.9.0'
-      t.path = opts[:path] || File.join('vendor', 'terraform')
+      t.version = version
+      t.path = path
       t.type = :zip
 
       t.os_ids = {mac: 'darwin', linux: 'linux'}
@@ -44,7 +47,7 @@ module RakeTerraform
               .build
               .execute(stdout: version_string)
 
-          if version_string.string.lines.first =~ /#{opts[:version]}/
+          if version_string.string.lines.first =~ /#{version}/
             return false
           end
         end

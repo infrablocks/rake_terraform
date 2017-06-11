@@ -9,9 +9,9 @@ module RakeTerraform
       parameter :argument_names, :default => []
 
       parameter :configuration_name, :required => true
-      parameter :configuration_directory, :required => true
+      parameter :source_directory, :required => true
+      parameter :work_directory, :required => true
 
-      parameter :backend
       parameter :backend_config
 
       parameter :vars, default: {}
@@ -29,17 +29,15 @@ module RakeTerraform
       end
 
       def define
-        if backend && state_file
-          raise ArgumentError.new(
-              "Only one of 'state_file' and 'backend' can be provided.")
-        end
-
         desc "Provision #{configuration_name} using terraform"
         task name, argument_names => [ensure_task] do |_, args|
+          configuration_directory = File.join(work_directory, source_directory)
+
           params = OpenStruct.new({
               configuration_name: configuration_name,
+              source_directory: source_directory,
+              work_directory: work_directory,
               configuration_directory: configuration_directory,
-              backend: backend,
               backend_config: backend_config,
               state_file: state_file,
               no_color: no_color,
@@ -57,23 +55,21 @@ module RakeTerraform
 
           puts "Provisioning #{configuration_name}"
 
-          RubyTerraform.clean
-          RubyTerraform.get(
-              directory: configuration_directory,
+          RubyTerraform.clean(
+              base_directory: configuration_directory)
+          RubyTerraform.init(
+              source: source_directory,
+              path: configuration_directory,
+              backend_config: derived_backend_config,
               no_color: no_color)
-          if backend
-            RubyTerraform.remote_config(
+          Dir.chdir(configuration_directory) do
+            RubyTerraform.apply(
                 no_color: no_color,
-                backend: backend,
-                backend_config: derived_backend_config)
+                no_backup: no_backup,
+                backup: backup_file,
+                state: state_file,
+                vars: derived_vars)
           end
-          RubyTerraform.apply(
-              no_color: no_color,
-              no_backup: no_backup,
-              backup: backup_file,
-              directory: configuration_directory,
-              state: state_file,
-              vars: derived_vars)
         end
       end
     end

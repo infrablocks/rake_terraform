@@ -14,9 +14,11 @@ describe RakeTerraform::Tasks::All do
   end
 
   context 'plan task' do
-    it 'configures with the provided configuration name and directory' do
+    it 'configures with the provided configuration name ' +
+           'source directory and work directory' do
       configuration_name = 'network'
-      configuration_directory = 'infra/network'
+      source_directory = 'infra/network'
+      work_directory = 'build'
 
       plan_configurer = stubbed_plan_configurer
 
@@ -25,18 +27,21 @@ describe RakeTerraform::Tasks::All do
       expect(plan_configurer)
           .to(receive(:configuration_name=).with(configuration_name))
       expect(plan_configurer)
-          .to(receive(:configuration_directory=).with(configuration_directory))
+          .to(receive(:source_directory=).with(source_directory))
+      expect(plan_configurer)
+          .to(receive(:work_directory=).with(work_directory))
+
 
       namespace :network do
         define_tasks do |t|
           t.configuration_name = configuration_name
-          t.configuration_directory = configuration_directory
+          t.source_directory = source_directory
+          t.work_directory = work_directory
         end
       end
     end
 
     it 'passes backend configuration when present' do
-      backend = 's3'
       backend_config = {
           bucket: 'some-bucket'
       }
@@ -46,25 +51,20 @@ describe RakeTerraform::Tasks::All do
       allow(RakeTerraform::Tasks::Plan)
           .to(receive(:new).and_yield(plan_configurer))
       expect(plan_configurer)
-          .to(receive(:backend=).with(backend))
-      expect(plan_configurer)
           .to(receive(:backend_config=).with(backend_config))
 
       namespace :network do
         define_tasks do |t|
-          t.backend = backend
           t.backend_config = backend_config
         end
       end
     end
 
-    it 'passes nil for backend when no backend configuration present' do
+    it 'passes nil for backend configuration when not present' do
       plan_configurer = stubbed_plan_configurer
 
       allow(RakeTerraform::Tasks::Plan)
           .to(receive(:new).and_yield(plan_configurer))
-      expect(plan_configurer)
-          .to(receive(:backend=).with(nil))
       expect(plan_configurer)
           .to(receive(:backend_config=).with(nil))
 
@@ -293,9 +293,11 @@ describe RakeTerraform::Tasks::All do
   end
 
   context 'provision task' do
-    it 'configures with the provided configuration name and directory' do
+    it 'configures with the provided configuration name ' +
+           'source directory and work directory' do
       configuration_name = 'network'
-      configuration_directory = 'infra/network'
+      source_directory = 'infra/network'
+      work_directory = 'build'
 
       provision_configurer = stubbed_provision_configurer
 
@@ -304,18 +306,20 @@ describe RakeTerraform::Tasks::All do
       expect(provision_configurer)
           .to(receive(:configuration_name=).with(configuration_name))
       expect(provision_configurer)
-          .to(receive(:configuration_directory=).with(configuration_directory))
+          .to(receive(:source_directory=).with(source_directory))
+      expect(provision_configurer)
+          .to(receive(:work_directory=).with(work_directory))
 
       namespace :network do
         define_tasks do |t|
           t.configuration_name = configuration_name
-          t.configuration_directory = configuration_directory
+          t.source_directory = source_directory
+          t.work_directory = work_directory
         end
       end
     end
 
     it 'passes backend configuration when present' do
-      backend = 's3'
       backend_config = {
           bucket: 'some-bucket'
       }
@@ -325,25 +329,20 @@ describe RakeTerraform::Tasks::All do
       allow(RakeTerraform::Tasks::Provision)
           .to(receive(:new).and_yield(provision_configurer))
       expect(provision_configurer)
-          .to(receive(:backend=).with(backend))
-      expect(provision_configurer)
           .to(receive(:backend_config=).with(backend_config))
 
       namespace :network do
         define_tasks do |t|
-          t.backend = backend
           t.backend_config = backend_config
         end
       end
     end
 
-    it 'passes nil for backend when no backend configuration present' do
+    it 'passes nil for backend configuration when not present' do
       provision_configurer = stubbed_provision_configurer
 
       allow(RakeTerraform::Tasks::Provision)
           .to(receive(:new).and_yield(provision_configurer))
-      expect(provision_configurer)
-          .to(receive(:backend=).with(nil))
       expect(provision_configurer)
           .to(receive(:backend_config=).with(nil))
 
@@ -602,9 +601,11 @@ describe RakeTerraform::Tasks::All do
   end
 
   context 'destroy task' do
-    it 'configures with the provided configuration name and directory' do
+    it 'configures with the provided configuration name ' +
+           'source directory and work directory' do
       configuration_name = 'network'
-      configuration_directory = 'infra/network'
+      source_directory = 'infra/network'
+      work_directory = 'build'
 
       destroy_configurer = stubbed_destroy_configurer
 
@@ -613,18 +614,20 @@ describe RakeTerraform::Tasks::All do
       expect(destroy_configurer)
           .to(receive(:configuration_name=).with(configuration_name))
       expect(destroy_configurer)
-          .to(receive(:configuration_directory=).with(configuration_directory))
+          .to(receive(:work_directory=).with(work_directory))
+      expect(destroy_configurer)
+          .to(receive(:source_directory=).with(source_directory))
 
       namespace :network do
         define_tasks do |t|
           t.configuration_name = configuration_name
-          t.configuration_directory = configuration_directory
+          t.source_directory = source_directory
+          t.work_directory = work_directory
         end
       end
     end
 
     it 'passes backend configuration when present' do
-      backend = 's3'
       backend_config = {
           bucket: 'some-bucket'
       }
@@ -634,13 +637,10 @@ describe RakeTerraform::Tasks::All do
       allow(RakeTerraform::Tasks::Destroy)
           .to(receive(:new).and_yield(destroy_configurer))
       expect(destroy_configurer)
-          .to(receive(:backend=).with(backend))
-      expect(destroy_configurer)
           .to(receive(:backend_config=).with(backend_config))
 
       namespace :network do
         define_tasks do |t|
-          t.backend = backend
           t.backend_config = backend_config
         end
       end
@@ -651,8 +651,6 @@ describe RakeTerraform::Tasks::All do
 
       allow(RakeTerraform::Tasks::Destroy)
           .to(receive(:new).and_yield(destroy_configurer))
-      expect(destroy_configurer)
-          .to(receive(:backend=).with(nil))
       expect(destroy_configurer)
           .to(receive(:backend_config=).with(nil))
 
@@ -912,7 +910,8 @@ describe RakeTerraform::Tasks::All do
   def define_tasks(&block)
     subject.new do |t|
       t.configuration_name = 'network'
-      t.configuration_directory = 'infra/network'
+      t.source_directory = 'infra/network'
+      t.work_directory = 'build'
 
       block.call(t) if block
     end
@@ -928,8 +927,8 @@ describe RakeTerraform::Tasks::All do
 
   def stubbed_plan_configurer
     double_allowing(
-        :name=, :argument_names=, :backend=, :backend_config=,
-        :configuration_name=, :configuration_directory=,
+        :name=, :argument_names=, :backend_config=,
+        :configuration_name=, :source_directory=, :work_directory=,
         :vars=, :state_file=,
         :no_color=, :plan_file=, :destroy=,
         :ensure_task=)
@@ -937,8 +936,8 @@ describe RakeTerraform::Tasks::All do
 
   def stubbed_provision_configurer
     double_allowing(
-        :name=, :argument_names=, :backend=, :backend_config=,
-        :configuration_name=, :configuration_directory=,
+        :name=, :argument_names=, :backend_config=,
+        :configuration_name=, :source_directory=, :work_directory=,
         :vars=, :state_file=,
         :no_color=, :no_backup=, :backup_file=,
         :ensure_task=)
@@ -946,8 +945,8 @@ describe RakeTerraform::Tasks::All do
 
   def stubbed_destroy_configurer
     double_allowing(
-        :name=, :argument_names=, :backend=, :backend_config=,
-        :configuration_name=, :configuration_directory=,
+        :name=, :argument_names=, :backend_config=,
+        :configuration_name=, :source_directory=, :work_directory=,
         :vars=, :state_file=,
         :no_color=, :no_backup=, :backup_file=,
         :ensure_task=)

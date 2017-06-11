@@ -2,9 +2,9 @@ module RakeTerraform
   module Tasks
     class All < TaskLib
       parameter :configuration_name, :required => true
-      parameter :configuration_directory, :required => true
+      parameter :source_directory, :required => true
+      parameter :work_directory, :required => true
 
-      parameter :backend
       parameter :backend_config
 
       parameter :vars
@@ -35,9 +35,9 @@ module RakeTerraform
           t.argument_names = plan_argument_names || argument_names || []
 
           t.configuration_name = configuration_name
-          t.configuration_directory = configuration_directory
+          t.source_directory = source_directory
+          t.work_directory = work_directory
 
-          t.backend = backend
           t.backend_config = backend_config
 
           t.vars = vars
@@ -54,9 +54,9 @@ module RakeTerraform
           t.argument_names = provision_argument_names || argument_names || []
 
           t.configuration_name = configuration_name
-          t.configuration_directory = configuration_directory
+          t.source_directory = source_directory
+          t.work_directory = work_directory
 
-          t.backend = backend
           t.backend_config = backend_config
 
           t.vars = vars
@@ -75,9 +75,9 @@ module RakeTerraform
 
 
           t.configuration_name = configuration_name
-          t.configuration_directory = configuration_directory
+          t.source_directory = source_directory
+          t.work_directory = work_directory
 
-          t.backend = backend
           t.backend_config = backend_config
 
           t.vars = vars
