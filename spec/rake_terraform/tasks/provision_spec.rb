@@ -137,7 +137,7 @@ describe RakeTerraform::Tasks::Provision do
     stub_ruby_terraform
 
     expect(RubyTerraform).to(receive(:clean))
-        .with(base_directory: configuration_directory)
+        .with(directory: configuration_directory)
 
     Rake::Task['provision'].invoke
   end

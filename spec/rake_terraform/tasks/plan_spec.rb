@@ -138,7 +138,7 @@ describe RakeTerraform::Tasks::Plan do
     stub_ruby_terraform
 
     expect(RubyTerraform).to(receive(:clean))
-        .with(base_directory: configuration_directory)
+        .with(directory: configuration_directory)
 
     Rake::Task['plan'].invoke
   end

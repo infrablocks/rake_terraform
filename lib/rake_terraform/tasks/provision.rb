@@ -56,7 +56,7 @@ module RakeTerraform
           puts "Provisioning #{configuration_name}"
 
           RubyTerraform.clean(
-              base_directory: configuration_directory)
+              directory: configuration_directory)
           RubyTerraform.init(
               source: source_directory,
               path: configuration_directory,
