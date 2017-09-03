@@ -58,12 +58,13 @@ module RakeTerraform
           RubyTerraform.clean(
               directory: configuration_directory)
           RubyTerraform.init(
-              source: source_directory,
+              from_module: source_directory,
               path: configuration_directory,
               backend_config: derived_backend_config,
               no_color: no_color)
           Dir.chdir(configuration_directory) do
             RubyTerraform.apply(
+                auto_approve: true,
                 no_color: no_color,
                 no_backup: no_backup,
                 backup: backup_file,

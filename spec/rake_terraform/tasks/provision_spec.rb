@@ -161,7 +161,7 @@ describe RakeTerraform::Tasks::Provision do
         .to(receive(:init)
                 .with(
                     hash_including(
-                        source: source_directory,
+                        from_module: source_directory,
                         path: configuration_directory)))
 
     Rake::Task['provision'].invoke
@@ -367,6 +367,25 @@ describe RakeTerraform::Tasks::Provision do
     expect(RubyTerraform)
         .to(receive(:apply)
                 .with(hash_including(state: state_file)))
+
+    Rake::Task['provision'].invoke
+  end
+
+  it 'passes an auto_approve parameter of true to apply' do
+    subject.new do |t|
+      t.configuration_name = 'network'
+      t.source_directory = 'infra/network'
+      t.work_directory = 'build'
+    end
+
+    stub_puts
+    stub_chdir
+    stub_ruby_terraform
+
+    expect(Dir).to(receive(:chdir).and_yield)
+    expect(RubyTerraform)
+        .to(receive(:apply)
+                .with(hash_including(auto_approve: true)))
 
     Rake::Task['provision'].invoke
   end

@@ -13,7 +13,7 @@ module RakeTerraform
 
   def self.define_installation_tasks(opts = {})
     namespace = opts[:namespace] || :terraform
-    version = opts[:version] || '0.9.0'
+    version = opts[:version] || '0.10.3'
     path = opts[:path] || File.join('vendor', 'terraform')
 
     RubyTerraform.configure do |c|

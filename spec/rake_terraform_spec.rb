@@ -98,14 +98,14 @@ RSpec.describe RakeTerraform do
         RakeTerraform.define_installation_tasks
       end
 
-      it 'sets the version to 0.9.0 by default' do
+      it 'sets the version to 0.10.3 by default' do
         task = stubbed_rake_dependencies_all_task
 
         allow(RubyTerraform).to(receive(:configure))
         expect(RakeDependencies::Tasks::All)
             .to(receive(:new).and_yield(task))
 
-        expect(task).to(receive(:version=).with('0.9.0'))
+        expect(task).to(receive(:version=).with('0.10.3'))
 
         RakeTerraform.define_installation_tasks
       end
@@ -117,10 +117,10 @@ RSpec.describe RakeTerraform do
         expect(RakeDependencies::Tasks::All)
             .to(receive(:new).and_yield(task))
 
-        expect(task).to(receive(:version=).with('0.8.7'))
+        expect(task).to(receive(:version=).with('0.10.4'))
 
         RakeTerraform.define_installation_tasks(
-            version: '0.8.7')
+            version: '0.10.4')
       end
 
       it 'uses a path of vendor/terraform by default' do
