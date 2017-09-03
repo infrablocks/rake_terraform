@@ -16,7 +16,6 @@ describe RakeTerraform::Tasks::Plan do
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
-
       end
     end
 
@@ -162,7 +161,7 @@ describe RakeTerraform::Tasks::Plan do
         .to(receive(:init)
                 .with(
                     hash_including(
-                        source: source_directory,
+                        from_module: source_directory,
                         path: configuration_directory)))
 
     Rake::Task['plan'].invoke

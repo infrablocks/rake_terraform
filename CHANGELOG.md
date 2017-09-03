@@ -1,3 +1,10 @@
+## 0.11.1 (September 3rd, 2017)
+
+IMPROVEMENTS:
+
+* The plan rake task now passes from_module to init to specify the source 
+  module
+
 ## 0.11.0 (September 3rd, 2017)
 
 BACKWARDS INCOMPATIBILITIES / NOTES:
