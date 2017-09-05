@@ -204,11 +204,7 @@ describe RakeTerraform::Tasks::Provision do
     stub_cp_r
     stub_ruby_terraform
 
-    expect(RubyTerraform)
-        .to(receive(:init)
-                .with(
-                    hash_including(
-                        path: configuration_directory)))
+    expect(RubyTerraform).to(receive(:init))
 
     Rake::Task['provision'].invoke
   end

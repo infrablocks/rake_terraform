@@ -62,7 +62,6 @@ module RakeTerraform
 
           Dir.chdir(configuration_directory) do
             RubyTerraform.init(
-                path: configuration_directory,
                 backend_config: derived_backend_config,
                 no_color: no_color)
             RubyTerraform.apply(
