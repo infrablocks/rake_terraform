@@ -55,12 +55,14 @@ module RakeTerraform
 
           RubyTerraform.clean(
               directory: configuration_directory)
-          RubyTerraform.init(
-              from_module: source_directory,
-              path: configuration_directory,
-              backend_config: derived_backend_config,
-              no_color: no_color)
+
+          cp_r source_directory, configuration_directory
+
           Dir.chdir(configuration_directory) do
+            RubyTerraform.init(
+                path: configuration_directory,
+                backend_config: derived_backend_config,
+                no_color: no_color)
             RubyTerraform.plan(
                 no_color: no_color,
                 destroy: destroy,

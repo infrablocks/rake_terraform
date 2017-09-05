@@ -121,7 +121,7 @@ describe RakeTerraform::Tasks::Plan do
         .to(eq(argument_names))
   end
 
-  it 'cleans terraform state from the work directory' do
+  it 'cleans the work directory' do
     source_directory = 'infra/network'
     work_directory = 'build'
     configuration_directory = "#{work_directory}/#{source_directory}"
@@ -134,10 +134,55 @@ describe RakeTerraform::Tasks::Plan do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
     expect(RubyTerraform).to(receive(:clean))
         .with(directory: configuration_directory)
+
+    Rake::Task['plan'].invoke
+  end
+
+  it 'recursively copies the source directory to the work directory' do
+    source_directory = 'infra/network'
+    work_directory = 'build'
+    configuration_directory = "#{work_directory}/#{source_directory}"
+
+    subject.new do |t|
+      t.configuration_name = 'network'
+      t.source_directory = source_directory
+      t.work_directory = work_directory
+    end
+
+    stub_puts
+    stub_chdir
+    stub_cp_r
+    stub_ruby_terraform
+
+    expect_any_instance_of(FileUtils)
+        .to(receive(:cp_r))
+        .with(source_directory, configuration_directory, anything)
+
+    Rake::Task['plan'].invoke
+  end
+
+  it 'switches to the work directory' do
+    source_directory = 'infra/network'
+    work_directory = 'build'
+    configuration_directory = "#{work_directory}/#{source_directory}"
+
+    subject.new do |t|
+      t.configuration_name = 'network'
+      t.source_directory = source_directory
+      t.work_directory = work_directory
+    end
+
+    stub_puts
+    stub_chdir
+    stub_cp_r
+    stub_ruby_terraform
+
+    expect(Dir).to(receive(:chdir)).with(configuration_directory).and_yield
 
     Rake::Task['plan'].invoke
   end
@@ -155,13 +200,13 @@ describe RakeTerraform::Tasks::Plan do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
     expect(RubyTerraform)
         .to(receive(:init)
                 .with(
                     hash_including(
-                        from_module: source_directory,
                         path: configuration_directory)))
 
     Rake::Task['plan'].invoke
@@ -176,6 +221,7 @@ describe RakeTerraform::Tasks::Plan do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -196,6 +242,7 @@ describe RakeTerraform::Tasks::Plan do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -221,6 +268,7 @@ describe RakeTerraform::Tasks::Plan do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -250,6 +298,7 @@ describe RakeTerraform::Tasks::Plan do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -277,9 +326,9 @@ describe RakeTerraform::Tasks::Plan do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).with(configuration_directory).and_yield)
     expect(RubyTerraform).to(receive(:plan))
 
     Rake::Task['plan'].invoke
@@ -301,9 +350,9 @@ describe RakeTerraform::Tasks::Plan do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).and_yield)
     expect(RubyTerraform)
         .to(receive(:plan)
                 .with(hash_including(vars: vars)))
@@ -334,9 +383,9 @@ describe RakeTerraform::Tasks::Plan do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).and_yield)
     expect(RubyTerraform)
         .to(receive(:plan)
                 .with(hash_including(vars: {
@@ -361,9 +410,9 @@ describe RakeTerraform::Tasks::Plan do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).and_yield)
     expect(RubyTerraform)
         .to(receive(:plan)
                 .with(hash_including(state: state_file)))
@@ -384,9 +433,9 @@ describe RakeTerraform::Tasks::Plan do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).and_yield)
     expect(RubyTerraform)
         .to(receive(:plan)
                 .with(hash_including(plan: plan_file)))
@@ -403,9 +452,9 @@ describe RakeTerraform::Tasks::Plan do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).and_yield)
     expect(RubyTerraform)
         .to(receive(:plan)
                 .with(hash_including(no_color: false)))
@@ -423,9 +472,9 @@ describe RakeTerraform::Tasks::Plan do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).and_yield)
     expect(RubyTerraform)
         .to(receive(:plan)
                 .with(hash_including(no_color: true)))
@@ -442,9 +491,9 @@ describe RakeTerraform::Tasks::Plan do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).and_yield)
     expect(RubyTerraform)
         .to(receive(:plan)
                 .with(hash_including(destroy: false)))
@@ -462,9 +511,9 @@ describe RakeTerraform::Tasks::Plan do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).and_yield)
     expect(RubyTerraform)
         .to(receive(:plan)
                 .with(hash_including(destroy: true)))
@@ -477,7 +526,11 @@ describe RakeTerraform::Tasks::Plan do
   end
 
   def stub_chdir
-    allow(Dir).to(receive(:chdir))
+    allow(Dir).to(receive(:chdir)).and_yield
+  end
+
+  def stub_cp_r
+    allow_any_instance_of(FileUtils).to(receive(:cp_r))
   end
 
   def stub_ruby_terraform

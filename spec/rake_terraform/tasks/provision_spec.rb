@@ -121,7 +121,7 @@ describe RakeTerraform::Tasks::Provision do
         .to(eq(argument_names))
   end
 
-  it 'cleans terraform state from the work directory' do
+  it 'cleans the work directory' do
     source_directory = 'infra/network'
     work_directory = 'build'
     configuration_directory = "#{work_directory}/#{source_directory}"
@@ -134,6 +134,7 @@ describe RakeTerraform::Tasks::Provision do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
     expect(RubyTerraform).to(receive(:clean))
@@ -141,6 +142,51 @@ describe RakeTerraform::Tasks::Provision do
 
     Rake::Task['provision'].invoke
   end
+
+  it 'recursively copies the source directory to the work directory' do
+    source_directory = 'infra/network'
+    work_directory = 'build'
+    configuration_directory = "#{work_directory}/#{source_directory}"
+
+    subject.new do |t|
+      t.configuration_name = 'network'
+      t.source_directory = source_directory
+      t.work_directory = work_directory
+    end
+
+    stub_puts
+    stub_chdir
+    stub_cp_r
+    stub_ruby_terraform
+
+    expect_any_instance_of(FileUtils)
+        .to(receive(:cp_r))
+        .with(source_directory, configuration_directory, anything)
+
+    Rake::Task['provision'].invoke
+  end
+
+  it 'switches to the work directory' do
+    source_directory = 'infra/network'
+    work_directory = 'build'
+    configuration_directory = "#{work_directory}/#{source_directory}"
+
+    subject.new do |t|
+      t.configuration_name = 'network'
+      t.source_directory = source_directory
+      t.work_directory = work_directory
+    end
+
+    stub_puts
+    stub_chdir
+    stub_cp_r
+    stub_ruby_terraform
+
+    expect(Dir).to(receive(:chdir)).with(configuration_directory).and_yield
+
+    Rake::Task['provision'].invoke
+  end
+
 
   it 'initialises the work directory' do
     source_directory = 'infra/network'
@@ -155,13 +201,13 @@ describe RakeTerraform::Tasks::Provision do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
     expect(RubyTerraform)
         .to(receive(:init)
                 .with(
                     hash_including(
-                        from_module: source_directory,
                         path: configuration_directory)))
 
     Rake::Task['provision'].invoke
@@ -176,6 +222,7 @@ describe RakeTerraform::Tasks::Provision do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -196,6 +243,7 @@ describe RakeTerraform::Tasks::Provision do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -221,6 +269,7 @@ describe RakeTerraform::Tasks::Provision do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -250,6 +299,7 @@ describe RakeTerraform::Tasks::Provision do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -277,9 +327,9 @@ describe RakeTerraform::Tasks::Provision do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).with(configuration_directory).and_yield)
     expect(RubyTerraform).to(receive(:apply))
 
     Rake::Task['provision'].invoke
@@ -301,9 +351,9 @@ describe RakeTerraform::Tasks::Provision do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).and_yield)
     expect(RubyTerraform)
         .to(receive(:apply)
                 .with(hash_including(vars: vars)))
@@ -334,9 +384,9 @@ describe RakeTerraform::Tasks::Provision do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).and_yield)
     expect(RubyTerraform)
         .to(receive(:apply)
                 .with(hash_including(vars: {
@@ -361,9 +411,9 @@ describe RakeTerraform::Tasks::Provision do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).and_yield)
     expect(RubyTerraform)
         .to(receive(:apply)
                 .with(hash_including(state: state_file)))
@@ -380,9 +430,9 @@ describe RakeTerraform::Tasks::Provision do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).and_yield)
     expect(RubyTerraform)
         .to(receive(:apply)
                 .with(hash_including(auto_approve: true)))
@@ -399,9 +449,9 @@ describe RakeTerraform::Tasks::Provision do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).and_yield)
     expect(RubyTerraform)
         .to(receive(:apply)
                 .with(hash_including(no_color: false)))
@@ -419,9 +469,9 @@ describe RakeTerraform::Tasks::Provision do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).and_yield)
     expect(RubyTerraform)
         .to(receive(:apply)
                 .with(hash_including(no_color: true)))
@@ -438,9 +488,9 @@ describe RakeTerraform::Tasks::Provision do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).and_yield)
     expect(RubyTerraform)
         .to(receive(:apply)
                 .with(hash_including(no_backup: false)))
@@ -459,9 +509,9 @@ describe RakeTerraform::Tasks::Provision do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).and_yield)
     expect(RubyTerraform)
         .to(receive(:apply)
                 .with(hash_including(no_backup: true)))
@@ -478,9 +528,9 @@ describe RakeTerraform::Tasks::Provision do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).and_yield)
     expect(RubyTerraform)
         .to(receive(:apply)
                 .with(hash_including(backup: nil)))
@@ -501,9 +551,9 @@ describe RakeTerraform::Tasks::Provision do
 
     stub_puts
     stub_chdir
+    stub_cp_r
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir).and_yield)
     expect(RubyTerraform)
         .to(receive(:apply)
                 .with(hash_including(backup: backup_file)))
@@ -516,7 +566,11 @@ describe RakeTerraform::Tasks::Provision do
   end
 
   def stub_chdir
-    allow(Dir).to(receive(:chdir))
+    allow(Dir).to(receive(:chdir)).and_yield
+  end
+
+  def stub_cp_r
+    allow_any_instance_of(FileUtils).to(receive(:cp_r))
   end
 
   def stub_ruby_terraform
