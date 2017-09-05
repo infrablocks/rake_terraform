@@ -144,10 +144,10 @@ describe RakeTerraform::Tasks::Plan do
     Rake::Task['plan'].invoke
   end
 
-  it 'recursively makes the work directory' do
+  it 'recursively makes the parent of the configuration directory' do
     source_directory = 'infra/network'
     work_directory = 'build'
-    configuration_directory = "#{work_directory}/#{source_directory}"
+    parent_of_configuration_directory = "#{work_directory}/infra"
 
     subject.new do |t|
       t.configuration_name = 'network'
@@ -163,7 +163,7 @@ describe RakeTerraform::Tasks::Plan do
 
     expect_any_instance_of(FileUtils)
         .to(receive(:mkdir_p))
-        .with(configuration_directory, anything)
+        .with(parent_of_configuration_directory, anything)
 
     Rake::Task['plan'].invoke
   end
