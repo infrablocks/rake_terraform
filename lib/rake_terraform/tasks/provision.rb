@@ -58,6 +58,7 @@ module RakeTerraform
           RubyTerraform.clean(
               directory: configuration_directory)
 
+          mkdir_p configuration_directory
           cp_r source_directory, configuration_directory
 
           Dir.chdir(configuration_directory) do

@@ -135,10 +135,35 @@ describe RakeTerraform::Tasks::Destroy do
     stub_puts
     stub_chdir
     stub_cp_r
+    stub_mkdir_p
     stub_ruby_terraform
 
     expect(RubyTerraform).to(receive(:clean))
         .with(directory: configuration_directory)
+
+    Rake::Task['destroy'].invoke
+  end
+
+  it 'recursively makes the work directory' do
+    source_directory = 'infra/network'
+    work_directory = 'build'
+    configuration_directory = "#{work_directory}/#{source_directory}"
+
+    subject.new do |t|
+      t.configuration_name = 'network'
+      t.source_directory = source_directory
+      t.work_directory = work_directory
+    end
+
+    stub_puts
+    stub_chdir
+    stub_cp_r
+    stub_mkdir_p
+    stub_ruby_terraform
+
+    expect_any_instance_of(FileUtils)
+        .to(receive(:mkdir_p))
+        .with(configuration_directory, anything)
 
     Rake::Task['destroy'].invoke
   end
@@ -157,6 +182,7 @@ describe RakeTerraform::Tasks::Destroy do
     stub_puts
     stub_chdir
     stub_cp_r
+    stub_mkdir_p
     stub_ruby_terraform
 
     expect_any_instance_of(FileUtils)
@@ -180,6 +206,7 @@ describe RakeTerraform::Tasks::Destroy do
     stub_puts
     stub_chdir
     stub_cp_r
+    stub_mkdir_p
     stub_ruby_terraform
 
     expect(Dir).to(receive(:chdir)).with(configuration_directory).and_yield
@@ -201,6 +228,7 @@ describe RakeTerraform::Tasks::Destroy do
     stub_puts
     stub_chdir
     stub_cp_r
+    stub_mkdir_p
     stub_ruby_terraform
 
     expect(RubyTerraform).to(receive(:init))
@@ -218,6 +246,7 @@ describe RakeTerraform::Tasks::Destroy do
     stub_puts
     stub_chdir
     stub_cp_r
+    stub_mkdir_p
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -239,6 +268,7 @@ describe RakeTerraform::Tasks::Destroy do
     stub_puts
     stub_chdir
     stub_cp_r
+    stub_mkdir_p
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -265,6 +295,7 @@ describe RakeTerraform::Tasks::Destroy do
     stub_puts
     stub_chdir
     stub_cp_r
+    stub_mkdir_p
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -295,6 +326,7 @@ describe RakeTerraform::Tasks::Destroy do
     stub_puts
     stub_chdir
     stub_cp_r
+    stub_mkdir_p
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -312,7 +344,6 @@ describe RakeTerraform::Tasks::Destroy do
   it 'destroys with terraform for the provided configuration' do
     source_directory = 'infra/network'
     work_directory = 'build'
-    configuration_directory = "#{work_directory}/#{source_directory}"
 
     subject.new do |t|
       t.configuration_name = 'network'
@@ -323,6 +354,7 @@ describe RakeTerraform::Tasks::Destroy do
     stub_puts
     stub_chdir
     stub_cp_r
+    stub_mkdir_p
     stub_ruby_terraform
 
     expect(RubyTerraform).to(receive(:destroy))
@@ -347,6 +379,7 @@ describe RakeTerraform::Tasks::Destroy do
     stub_puts
     stub_chdir
     stub_cp_r
+    stub_mkdir_p
     stub_ruby_terraform
 
     expect(Dir).to(receive(:chdir).and_yield)
@@ -381,6 +414,7 @@ describe RakeTerraform::Tasks::Destroy do
     stub_puts
     stub_chdir
     stub_cp_r
+    stub_mkdir_p
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -408,6 +442,7 @@ describe RakeTerraform::Tasks::Destroy do
     stub_puts
     stub_chdir
     stub_cp_r
+    stub_mkdir_p
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -427,6 +462,7 @@ describe RakeTerraform::Tasks::Destroy do
     stub_puts
     stub_chdir
     stub_cp_r
+    stub_mkdir_p
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -448,6 +484,7 @@ describe RakeTerraform::Tasks::Destroy do
     stub_puts
     stub_chdir
     stub_cp_r
+    stub_mkdir_p
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -467,6 +504,7 @@ describe RakeTerraform::Tasks::Destroy do
     stub_puts
     stub_chdir
     stub_cp_r
+    stub_mkdir_p
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -488,6 +526,7 @@ describe RakeTerraform::Tasks::Destroy do
     stub_puts
     stub_chdir
     stub_cp_r
+    stub_mkdir_p
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -507,6 +546,7 @@ describe RakeTerraform::Tasks::Destroy do
     stub_puts
     stub_chdir
     stub_cp_r
+    stub_mkdir_p
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -530,6 +570,7 @@ describe RakeTerraform::Tasks::Destroy do
     stub_puts
     stub_chdir
     stub_cp_r
+    stub_mkdir_p
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -549,6 +590,7 @@ describe RakeTerraform::Tasks::Destroy do
     stub_puts
     stub_chdir
     stub_cp_r
+    stub_mkdir_p
     stub_ruby_terraform
 
     expect(RubyTerraform)
@@ -568,6 +610,10 @@ describe RakeTerraform::Tasks::Destroy do
 
   def stub_cp_r
     allow_any_instance_of(FileUtils).to(receive(:cp_r))
+  end
+
+  def stub_mkdir_p
+    allow_any_instance_of(FileUtils).to(receive(:mkdir_p))
   end
 
   def stub_ruby_terraform
