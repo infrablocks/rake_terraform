@@ -1,4 +1,4 @@
-## 0.12.0 (September 28th, 2017)
+## 0.16.0 (September 28th, 2017)
 
 IMPROVEMENTS:
 
