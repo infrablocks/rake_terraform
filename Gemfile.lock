@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rake_terraform (0.15.0)
+    rake_terraform (0.16.0)
       rake_dependencies (~> 0.15)
       ruby-terraform (~> 0.9)
 
@@ -66,4 +66,4 @@ DEPENDENCIES
   rspec (~> 3.0)
 
 BUNDLED WITH
-   1.15.4
+   1.16.0.pre.2
