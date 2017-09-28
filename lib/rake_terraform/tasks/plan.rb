@@ -50,6 +50,10 @@ module RakeTerraform
               backend_config.call(
                   *[args, params].slice(0, backend_config.arity)) :
               backend_config
+          derived_state_file = state_file.respond_to?(:call) ?
+              state_file.call(
+                  *[args, params].slice(0, state_file.arity)) :
+              state_file
 
           puts "Planning #{configuration_name}"
 
@@ -66,7 +70,7 @@ module RakeTerraform
             RubyTerraform.plan(
                 no_color: no_color,
                 destroy: destroy,
-                state: state_file,
+                state: derived_state_file,
                 plan: plan_file,
                 vars: derived_vars)
           end

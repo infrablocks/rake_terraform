@@ -452,6 +452,32 @@ describe RakeTerraform::Tasks::Plan do
     Rake::Task['plan'].invoke
   end
 
+  it 'uses the provided state file factory when present' do
+    subject.new do |t|
+      t.argument_names = [:deployment_identifier]
+
+      t.configuration_name = 'network'
+      t.source_directory = 'infra/network'
+      t.work_directory = 'build'
+
+      t.state_file = lambda do |args, params|
+        "path/to/state/#{args.deployment_identifier}/#{params.configuration_name}.tfstate"
+      end
+    end
+
+    stub_puts
+    stub_chdir
+    stub_cp_r
+    stub_mkdir_p
+    stub_ruby_terraform
+
+    expect(RubyTerraform)
+        .to(receive(:plan)
+                .with(hash_including(state: "path/to/state/staging/network.tfstate")))
+
+    Rake::Task['plan'].invoke('staging')
+  end
+
   it 'uses the provided plan file when present' do
     plan_file = 'some/plan.tfplan'
 

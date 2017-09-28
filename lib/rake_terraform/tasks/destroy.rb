@@ -51,6 +51,10 @@ module RakeTerraform
               backend_config.call(
                   *[args, params].slice(0, backend_config.arity)) :
               backend_config
+          derived_state_file = state_file.respond_to?(:call) ?
+              state_file.call(
+                  *[args, params].slice(0, state_file.arity)) :
+              state_file
 
           puts "Destroying #{configuration_name}"
 
@@ -69,7 +73,7 @@ module RakeTerraform
                 no_color: no_color,
                 no_backup: no_backup,
                 backup: backup_file,
-                state: state_file,
+                state: derived_state_file,
                 vars: derived_vars)
           end
         end

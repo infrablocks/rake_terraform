@@ -1,3 +1,10 @@
+## 0.12.0 (September 28th, 2017)
+
+IMPROVEMENTS:
+
+* The state file can now be specified as a lambda that receives task arguments
+  and parameters and is expected to return the state file path.
+
 ## 0.11.1 (September 3rd, 2017)
 
 IMPROVEMENTS:

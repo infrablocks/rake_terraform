@@ -390,7 +390,7 @@ describe RakeTerraform::Tasks::Destroy do
     Rake::Task['destroy'].invoke
   end
 
-  it 'uses the provided vars factory in the terraform apply call' do
+  it 'uses the provided vars factory in the terraform destroy call' do
     subject.new do |t|
       t.argument_names = [:deployment_identifier]
 
@@ -450,6 +450,32 @@ describe RakeTerraform::Tasks::Destroy do
                 .with(hash_including(state: state_file)))
 
     Rake::Task['destroy'].invoke
+  end
+
+  it 'uses the provided state file factory when present' do
+    subject.new do |t|
+      t.argument_names = [:deployment_identifier]
+
+      t.configuration_name = 'network'
+      t.source_directory = 'infra/network'
+      t.work_directory = 'build'
+
+      t.state_file = lambda do |args, params|
+        "path/to/state/#{args.deployment_identifier}/#{params.configuration_name}.tfstate"
+      end
+    end
+
+    stub_puts
+    stub_chdir
+    stub_cp_r
+    stub_mkdir_p
+    stub_ruby_terraform
+
+    expect(RubyTerraform)
+        .to(receive(:destroy)
+                .with(hash_including(state: "path/to/state/staging/network.tfstate")))
+
+    Rake::Task['destroy'].invoke('staging')
   end
 
   it 'passes a no_color parameter of false to destroy by default' do
