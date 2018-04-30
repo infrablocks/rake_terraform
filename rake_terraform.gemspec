@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'rake_dependencies', '~> 0.15'
-  spec.add_dependency 'ruby-terraform', '~> 0.9'
+  # spec.add_dependency 'ruby-terraform', :git => 'https://github.com/kief/ruby_terraform.git', :branch => 'add_validate'
 
   spec.add_development_dependency 'bundler', '~> 1.14'
   spec.add_development_dependency 'rake', '~> 11.0'
