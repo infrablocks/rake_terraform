@@ -214,137 +214,9 @@ describe RakeTerraform::Tasks::Validate do
     Rake::Task['validate'].invoke
   end
 
-  it 'initialises the work directory' do
-    source_directory = 'infra/network'
-    work_directory = 'build'
-    configuration_directory = "#{work_directory}/#{source_directory}"
-
-    subject.new do |t|
-      t.configuration_name = 'network'
-      t.source_directory = source_directory
-      t.work_directory = work_directory
-    end
-
-    stub_puts
-    stub_chdir
-    stub_cp_r
-    stub_mkdir_p
-    stub_ruby_terraform
-
-    expect(RubyTerraform).to(receive(:init))
-
-    Rake::Task['validate'].invoke
-  end
-
-  it 'passes a no_color parameter of false to init by default' do
-    subject.new do |t|
-      t.configuration_name = 'network'
-      t.source_directory = 'infra/network'
-      t.work_directory = 'build'
-    end
-
-    stub_puts
-    stub_chdir
-    stub_cp_r
-    stub_mkdir_p
-    stub_ruby_terraform
-
-    expect(RubyTerraform)
-        .to(receive(:init)
-                .with(hash_including(no_color: false)))
-
-    Rake::Task['validate'].invoke
-  end
-
-  it 'passes the provided value for the no_color parameter to init when present' do
-    subject.new do |t|
-      t.configuration_name = 'network'
-      t.source_directory = 'infra/network'
-      t.work_directory = 'build'
-
-      t.no_color = true
-    end
-
-    stub_puts
-    stub_chdir
-    stub_cp_r
-    stub_mkdir_p
-    stub_ruby_terraform
-
-    expect(RubyTerraform)
-        .to(receive(:init)
-                .with(hash_including(no_color: true)))
-
-    Rake::Task['validate'].invoke
-  end
-
-  it 'passes the provided backend config to init when present' do
-    backend_config = {
-        bucket: 'some-bucket',
-        key: 'some-key.tfstate',
-        region: 'eu-west-2'
-    }
-    subject.new do |t|
-      t.configuration_name = 'network'
-      t.source_directory = 'infra/network'
-      t.work_directory = 'build'
-
-      t.backend_config = backend_config
-    end
-
-    stub_puts
-    stub_chdir
-    stub_cp_r
-    stub_mkdir_p
-    stub_ruby_terraform
-
-    expect(RubyTerraform)
-        .to(receive(:init)
-                .with(hash_including(
-                          backend_config: backend_config)))
-
-    Rake::Task['validate'].invoke
-  end
-
-  it 'uses the provided backend config factory when supplied' do
-    subject.new do |t|
-      t.argument_names = [:bucket_name]
-
-      t.configuration_name = 'network'
-      t.source_directory = 'infra/network'
-      t.work_directory = 'build'
-
-      t.backend_config = lambda do |args, params|
-        {
-            bucket: args.bucket_name,
-            key: "#{params.configuration_name}.tfstate",
-            region: 'eu-west-2'
-        }
-      end
-    end
-
-    stub_puts
-    stub_chdir
-    stub_cp_r
-    stub_mkdir_p
-    stub_ruby_terraform
-
-    expect(RubyTerraform)
-        .to(receive(:init)
-                .with(hash_including(
-                          backend_config: {
-                              bucket: 'bucket-from-args',
-                              key: 'network.tfstate',
-                              region: 'eu-west-2'
-                          })))
-
-    Rake::Task['validate'].invoke('bucket-from-args')
-  end
-
   it 'validates with terraform for the provided configuration directory' do
     source_directory = 'infra/network'
     work_directory = 'build'
-    configuration_directory = "#{work_directory}/#{source_directory}"
 
     subject.new do |t|
       t.configuration_name = 'network'
@@ -537,7 +409,6 @@ describe RakeTerraform::Tasks::Validate do
 
   def stub_ruby_terraform
     allow(RubyTerraform).to(receive(:clean))
-    allow(RubyTerraform).to(receive(:init))
     allow(RubyTerraform).to(receive(:validate))
   end
 end
