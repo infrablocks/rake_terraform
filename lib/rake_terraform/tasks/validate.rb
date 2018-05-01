@@ -61,9 +61,6 @@ module RakeTerraform
           cp_r source_directory, configuration_directory
 
           Dir.chdir(configuration_directory) do
-            RubyTerraform.init(
-                backend_config: derived_backend_config,
-                no_color: no_color)
             RubyTerraform.validate(
                 no_color: no_color,
                 state: derived_state_file,
