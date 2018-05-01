@@ -1,3 +1,10 @@
+## 0.17.0 (May 1st, 2018)
+
+IMPROVEMENTS:
+
+* A validate task is now included and installed as part of the default task
+  definition. 
+
 ## 0.16.0 (September 28th, 2017)
 
 IMPROVEMENTS:
