@@ -1,9 +1,16 @@
+GIT
+  remote: https://github.com/kief/ruby_terraform.git
+  revision: 853935939a17bdfb616892b0217880f31cfed732
+  branch: add_validate
+  specs:
+    ruby-terraform (0.11.2)
+      lino (~> 1.1)
+
 PATH
   remote: .
   specs:
-    rake_terraform (0.16.0)
+    rake_terraform (0.16.1)
       rake_dependencies (~> 0.15)
-      ruby-terraform (~> 0.9)
 
 GEM
   remote: https://rubygems.org/
@@ -46,8 +53,6 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.5.0)
     rspec-support (3.5.0)
-    ruby-terraform (0.9.0)
-      lino (~> 1.1)
     rubyzip (1.2.1)
     thread_safe (0.3.5)
     tzinfo (1.2.2)
@@ -64,6 +69,7 @@ DEPENDENCIES
   rake (~> 11.0)
   rake_terraform!
   rspec (~> 3.0)
+  ruby-terraform!
 
 BUNDLED WITH
-   1.16.0.pre.2
+   1.16.1

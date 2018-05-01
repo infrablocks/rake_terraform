@@ -20,6 +20,9 @@ module RakeTerraform
 
       parameter :ensure_task, :default => :'terraform:ensure'
 
+      parameter :validate_task_name, :default => :validate
+      parameter :validate_argument_names
+
       parameter :plan_task_name, :default => :plan
       parameter :plan_argument_names
 
@@ -30,6 +33,23 @@ module RakeTerraform
       parameter :destroy_argument_names
 
       def define
+        Validate.new do |t|
+          t.name = validate_task_name
+          t.argument_names = validate_argument_names || argument_names || []
+
+          t.configuration_name = configuration_name
+          t.source_directory = source_directory
+          t.work_directory = work_directory
+
+          t.backend_config = backend_config
+
+          t.vars = vars
+          t.state_file = state_file
+
+          t.no_color = no_color
+
+          t.ensure_task = ensure_task
+        end
         Plan.new do |t|
           t.name = plan_task_name
           t.argument_names = plan_argument_names || argument_names || []
