@@ -48,6 +48,11 @@ module RakeTerraform
                   *[args, params].slice(0, state_file.arity)) :
               state_file
 
+          var_file = "./#{source_directory}/terraform.tfvars"
+          File.open(var_file, 'w') do |file|
+            derived_vars.each{ |k, v| file.write("#{k} = \"#{v}\"\n") }
+          end
+
           puts "Validating #{configuration_name}"
 
           RubyTerraform.clean(
@@ -60,7 +65,7 @@ module RakeTerraform
             RubyTerraform.validate(
                 no_color: no_color,
                 state: derived_state_file,
-                vars: derived_vars)
+                var_file: "terraform.tfvars")
           end
         end
       end
