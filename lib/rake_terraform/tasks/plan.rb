@@ -55,7 +55,7 @@ module RakeTerraform
                   *[args, params].slice(0, state_file.arity)) :
               state_file
 
-          var_file = "./#{source_directory}/terraform.tfvars"
+          var_file = File.join(configuration_directory, "terraform.tfvars")
           File.open(var_file, 'w') do |file|
             derived_vars.each{ |k, v| file.write("#{k} = \"#{v}\"\n") }
           end
@@ -77,7 +77,7 @@ module RakeTerraform
                 destroy: destroy,
                 state: derived_state_file,
                 plan: plan_file,
-                var_file: "terraform.tfvars")
+                var_file: var_file)
           end
         end
       end
