@@ -57,11 +57,6 @@ module RakeTerraform
                   *[args, params].slice(0, state_file.arity)) :
               state_file
 
-          var_file = File.join(configuration_directory, "terraform.tfvars")
-          File.open(var_file, 'w') do |file|
-            derived_vars.each{ |k, v| file.write("#{k} = \"#{v}\"\n") }
-          end
-
           puts "Provisioning #{configuration_name}"
 
           RubyTerraform.clean(
@@ -69,6 +64,11 @@ module RakeTerraform
 
           mkdir_p File.dirname(configuration_directory)
           cp_r source_directory, configuration_directory
+
+          var_file = File.join(configuration_directory, "terraform.tfvars")
+          File.open(var_file, 'w') do |file|
+            derived_vars.each{ |k, v| file.write("#{k} = \"#{v}\"\n") }
+          end
 
           Dir.chdir(configuration_directory) do
             RubyTerraform.init(
@@ -80,7 +80,7 @@ module RakeTerraform
                 no_backup: no_backup,
                 backup: backup_file,
                 state: derived_state_file,
-                var_file: var_file)
+                var_file: "terraform.tfvars")
           end
         end
       end
