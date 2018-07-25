@@ -43,6 +43,10 @@ module RakeTerraform
           derived_vars = vars.respond_to?(:call) ?
               vars.call(*[args, params].slice(0, vars.arity)) :
               vars
+          derived_backend_config = backend_config.respond_to?(:call) ?
+              backend_config.call(
+                  *[args, params].slice(0, backend_config.arity)) :
+              backend_config
           derived_state_file = state_file.respond_to?(:call) ?
               state_file.call(
                   *[args, params].slice(0, state_file.arity)) :
@@ -62,6 +66,9 @@ module RakeTerraform
           end
 
           Dir.chdir(configuration_directory) do
+            RubyTerraform.init(
+                backend_config: derived_backend_config,
+                no_color: no_color)
             RubyTerraform.validate(
                 no_color: no_color,
                 state: derived_state_file,
