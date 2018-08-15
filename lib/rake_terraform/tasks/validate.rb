@@ -43,6 +43,10 @@ module RakeTerraform
           derived_vars = vars.respond_to?(:call) ?
               vars.call(*[args, params].slice(0, vars.arity)) :
               vars
+          derived_backend_config = backend_config.respond_to?(:call) ?
+              backend_config.call(
+                  *[args, params].slice(0, backend_config.arity)) :
+              backend_config
           derived_state_file = state_file.respond_to?(:call) ?
               state_file.call(
                   *[args, params].slice(0, state_file.arity)) :
@@ -56,11 +60,19 @@ module RakeTerraform
           mkdir_p File.dirname(configuration_directory)
           cp_r source_directory, configuration_directory
 
+          var_file = File.join(configuration_directory, "terraform.tfvars")
+          File.open(var_file, 'w') do |file|
+            derived_vars.each{ |k, v| file.write("#{k} = \"#{v}\"\n") }
+          end
+
           Dir.chdir(configuration_directory) do
+            RubyTerraform.init(
+                backend_config: derived_backend_config,
+                no_color: no_color)
             RubyTerraform.validate(
                 no_color: no_color,
                 state: derived_state_file,
-                vars: derived_vars)
+                var_file: "terraform.tfvars")
           end
         end
       end

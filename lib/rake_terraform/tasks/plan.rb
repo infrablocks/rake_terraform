@@ -63,6 +63,11 @@ module RakeTerraform
           mkdir_p File.dirname(configuration_directory)
           cp_r source_directory, configuration_directory
 
+          var_file = File.join(configuration_directory, "terraform.tfvars")
+          File.open(var_file, 'w') do |file|
+            derived_vars.each{ |k, v| file.write("#{k} = \"#{v}\"\n") }
+          end
+
           Dir.chdir(configuration_directory) do
             RubyTerraform.init(
                 backend_config: derived_backend_config,
@@ -72,7 +77,7 @@ module RakeTerraform
                 destroy: destroy,
                 state: derived_state_file,
                 plan: plan_file,
-                vars: derived_vars)
+                var_file: "terraform.tfvars")
           end
         end
       end
