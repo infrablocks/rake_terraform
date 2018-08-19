@@ -17,6 +17,7 @@ module RakeTerraform
       parameter :vars, default: {}
       parameter :state_file
 
+      parameter :debug, :default => false
       parameter :no_color, :default => false
 
       parameter :plan_file
@@ -31,6 +32,8 @@ module RakeTerraform
       def define
         desc "Plan #{configuration_name} using terraform"
         task name, argument_names => [ensure_task] do |_, args|
+          puts "Planning #{configuration_name}"
+
           configuration_directory = File.join(work_directory, source_directory)
 
           params = OpenStruct.new({
@@ -40,22 +43,21 @@ module RakeTerraform
               configuration_directory: configuration_directory,
               backend_config: backend_config,
               state_file: state_file,
+              debug: debug,
               no_color: no_color,
           })
 
-          derived_vars = vars.respond_to?(:call) ?
-              vars.call(*[args, params].slice(0, vars.arity)) :
-              vars
           derived_backend_config = backend_config.respond_to?(:call) ?
               backend_config.call(
                   *[args, params].slice(0, backend_config.arity)) :
               backend_config
+          derived_vars = vars.respond_to?(:call) ?
+              vars.call(*[args, params].slice(0, vars.arity)) :
+              vars
           derived_state_file = state_file.respond_to?(:call) ?
               state_file.call(
                   *[args, params].slice(0, state_file.arity)) :
               state_file
-
-          puts "Planning #{configuration_name}"
 
           RubyTerraform.clean(
               directory: configuration_directory)

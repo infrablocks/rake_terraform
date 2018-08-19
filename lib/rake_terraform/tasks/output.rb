@@ -15,6 +15,7 @@ module RakeTerraform
 
       parameter :state_file
 
+      parameter :debug, :default => false
       parameter :no_color, :default => false
       parameter :no_print_output, :default => false
 
@@ -27,6 +28,8 @@ module RakeTerraform
       def define
         desc "Output #{configuration_name} using terraform"
         task name, argument_names => [ensure_task] do |_, args|
+          puts "Output of #{configuration_name}"
+
           configuration_directory = File.join(work_directory, source_directory)
 
           params = OpenStruct.new({
@@ -36,8 +39,9 @@ module RakeTerraform
               configuration_directory: configuration_directory,
               backend_config: backend_config,
               state_file: state_file,
+              debug: debug,
               no_color: no_color,
-              no_print_output: no_print_output
+              no_print_output: no_print_output,
           })
 
           derived_backend_config = backend_config.respond_to?(:call) ?
@@ -48,8 +52,6 @@ module RakeTerraform
               state_file.call(
                   *[args, params].slice(0, state_file.arity)) :
               state_file
-
-          puts "Output of #{configuration_name}"
 
           RubyTerraform.clean(
               directory: configuration_directory)

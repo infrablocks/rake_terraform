@@ -10,6 +10,10 @@ module RakeTerraform
       parameter :vars
       parameter :state_file
 
+      # Emit additional information for debugging purposes
+      # Useful to check this value in lambdas passed to backend_config, vars and state_file
+      parameter :debug, :default => false
+
       parameter :no_color, :default => false
       parameter :no_backup, :default => false
       parameter :no_print_output, :default => false
@@ -17,7 +21,7 @@ module RakeTerraform
       parameter :backup_file
       parameter :plan_file
 
-      # Allows specifying rake task arguments, for example bucket:provision[my_deployment]
+      # Allows specifying rake task arguments, for example bucket:provision[my_deployment_id]
       parameter :argument_names
 
       parameter :ensure_task, :default => :'terraform:ensure'
@@ -51,6 +55,7 @@ module RakeTerraform
           t.vars = vars
           t.state_file = state_file
 
+          t.debug = debug
           t.no_color = no_color
 
           t.ensure_task = ensure_task
@@ -68,6 +73,7 @@ module RakeTerraform
           t.vars = vars
           t.state_file = state_file
 
+          t.debug = debug
           t.no_color = no_color
 
           t.plan_file = plan_file
@@ -87,6 +93,7 @@ module RakeTerraform
           t.vars = vars
           t.state_file = state_file
 
+          t.debug = debug
           t.no_color = no_color
           t.no_backup = no_backup
 
@@ -107,6 +114,7 @@ module RakeTerraform
           t.vars = vars
           t.state_file = state_file
 
+          t.debug = debug
           t.no_color = no_color
           t.no_backup = no_backup
 
@@ -126,6 +134,7 @@ module RakeTerraform
 
           t.state_file = state_file
 
+          t.debug = debug
           t.no_color = no_color
           t.no_print_output = no_print_output
 

@@ -138,6 +138,36 @@ describe RakeTerraform::Tasks::All do
       end
     end
 
+    it 'passes supplied value for debug when provided' do
+      debug = true
+
+      validate_configurer = stubbed_validate_configurer
+
+      allow(RakeTerraform::Tasks::Validate)
+          .to(receive(:new).and_yield(validate_configurer))
+      expect(validate_configurer)
+          .to(receive(:debug=).with(debug))
+
+      namespace :network do
+        define_tasks do |t|
+          t.debug = debug
+        end
+      end
+    end
+
+    it 'passes false for debug by default' do
+      validate_configurer = stubbed_validate_configurer
+
+      allow(RakeTerraform::Tasks::Validate)
+          .to(receive(:new).and_yield(validate_configurer))
+      expect(validate_configurer)
+          .to(receive(:debug=).with(false))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
     it 'passes supplied value for no_color when provided' do
       no_color = true
 
@@ -417,6 +447,36 @@ describe RakeTerraform::Tasks::All do
       end
     end
 
+    it 'passes supplied value for debug when provided' do
+      debug = true
+
+      plan_configurer = stubbed_plan_configurer
+
+      allow(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:debug=).with(debug))
+
+      namespace :network do
+        define_tasks do |t|
+          t.debug = debug
+        end
+      end
+    end
+
+    it 'passes false for debug by default' do
+      plan_configurer = stubbed_plan_configurer
+
+      allow(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:debug=).with(false))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
     it 'passes supplied value for no_color when provided' do
       no_color = true
 
@@ -659,6 +719,36 @@ describe RakeTerraform::Tasks::All do
           .to(receive(:new).and_yield(provision_configurer))
       expect(provision_configurer)
           .to(receive(:state_file=).with(nil))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
+    it 'passes supplied value for debug when provided' do
+      debug = true
+
+      provision_configurer = stubbed_provision_configurer
+
+      allow(RakeTerraform::Tasks::Provision)
+          .to(receive(:new).and_yield(provision_configurer))
+      expect(provision_configurer)
+          .to(receive(:debug=).with(debug))
+
+      namespace :network do
+        define_tasks do |t|
+          t.debug = debug
+        end
+      end
+    end
+
+    it 'passes false for debug by default' do
+      provision_configurer = stubbed_provision_configurer
+
+      allow(RakeTerraform::Tasks::Provision)
+          .to(receive(:new).and_yield(provision_configurer))
+      expect(provision_configurer)
+          .to(receive(:debug=).with(false))
 
       namespace :network do
         define_tasks
@@ -973,6 +1063,36 @@ describe RakeTerraform::Tasks::All do
       end
     end
 
+    it 'passes supplied value for debug when provided' do
+      debug = true
+
+      destroy_configurer = stubbed_destroy_configurer
+
+      allow(RakeTerraform::Tasks::Destroy)
+          .to(receive(:new).and_yield(destroy_configurer))
+      expect(destroy_configurer)
+          .to(receive(:debug=).with(debug))
+
+      namespace :network do
+        define_tasks do |t|
+          t.debug = debug
+        end
+      end
+    end
+
+    it 'passes false for debug by default' do
+      destroy_configurer = stubbed_destroy_configurer
+
+      allow(RakeTerraform::Tasks::Destroy)
+          .to(receive(:new).and_yield(destroy_configurer))
+      expect(destroy_configurer)
+          .to(receive(:debug=).with(false))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
     it 'passes supplied value for no_color when provided' do
       no_color = true
 
@@ -1247,6 +1367,36 @@ describe RakeTerraform::Tasks::All do
       end
     end
 
+    it 'passes supplied value for debug when provided' do
+      debug = true
+
+      output_configurer = stubbed_output_configurer
+
+      allow(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:debug=).with(debug))
+
+      namespace :network do
+        define_tasks do |t|
+          t.debug = debug
+        end
+      end
+    end
+
+    it 'passes false for debug by default' do
+      output_configurer = stubbed_output_configurer
+
+      allow(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:debug=).with(false))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
     it 'passes supplied value for no_color when provided' do
       no_color = true
 
@@ -1425,7 +1575,7 @@ describe RakeTerraform::Tasks::All do
         :name=, :argument_names=, :backend_config=,
         :configuration_name=, :source_directory=, :work_directory=,
         :vars=, :state_file=,
-        :no_color=,
+        :debug=, :no_color=,
         :ensure_task=)
   end
 
@@ -1434,7 +1584,7 @@ describe RakeTerraform::Tasks::All do
         :name=, :argument_names=, :backend_config=,
         :configuration_name=, :source_directory=, :work_directory=,
         :vars=, :state_file=,
-        :no_color=, :plan_file=, :destroy=,
+        :debug=, :no_color=, :plan_file=, :destroy=,
         :ensure_task=)
   end
 
@@ -1443,7 +1593,7 @@ describe RakeTerraform::Tasks::All do
         :name=, :argument_names=, :backend_config=,
         :configuration_name=, :source_directory=, :work_directory=,
         :vars=, :state_file=,
-        :no_color=, :no_backup=, :backup_file=,
+        :debug=, :no_color=, :no_backup=, :backup_file=,
         :ensure_task=)
   end
 
@@ -1452,7 +1602,7 @@ describe RakeTerraform::Tasks::All do
         :name=, :argument_names=, :backend_config=,
         :configuration_name=, :source_directory=, :work_directory=,
         :vars=, :state_file=,
-        :no_color=, :no_backup=, :backup_file=,
+        :debug=, :no_color=, :no_backup=, :backup_file=,
         :ensure_task=)
   end
 
@@ -1461,7 +1611,7 @@ describe RakeTerraform::Tasks::All do
         :name=, :argument_names=, :backend_config=,
         :configuration_name=, :source_directory=, :work_directory=,
         :vars=, :state_file=,
-        :no_color=, :no_print_output=,
+        :debug=, :no_color=, :no_print_output=,
         :ensure_task=)
   end
 end
