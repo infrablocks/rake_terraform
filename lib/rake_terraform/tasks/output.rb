@@ -13,14 +13,10 @@ module RakeTerraform
 
       parameter :backend_config
 
-      parameter :vars, default: {}
       parameter :state_file
 
       parameter :no_color, :default => false
-      parameter :no_backup, :default => false
       parameter :no_print_output, :default => false
-
-      parameter :backup_file
 
       parameter :ensure_task, :default => :'terraform:ensure'
 
@@ -39,7 +35,9 @@ module RakeTerraform
               work_directory: work_directory,
               configuration_directory: configuration_directory,
               backend_config: backend_config,
-              state_file: state_file
+              state_file: state_file,
+              no_color: no_color,
+              no_print_output: no_print_output
           })
 
           derived_backend_config = backend_config.respond_to?(:call) ?

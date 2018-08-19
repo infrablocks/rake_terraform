@@ -12,6 +12,7 @@ module RakeTerraform
 
       parameter :no_color, :default => false
       parameter :no_backup, :default => false
+      parameter :no_print_output, :default => false
 
       parameter :backup_file
       parameter :plan_file
@@ -96,7 +97,6 @@ module RakeTerraform
           t.name = destroy_task_name
           t.argument_names = destroy_argument_names || argument_names || []
 
-
           t.configuration_name = configuration_name
           t.source_directory = source_directory
           t.work_directory = work_directory
@@ -117,20 +117,16 @@ module RakeTerraform
           t.name = output_task_name
           t.argument_names = output_argument_names || argument_names || []
 
-
           t.configuration_name = configuration_name
           t.source_directory = source_directory
           t.work_directory = work_directory
 
           t.backend_config = backend_config
 
-          t.vars = vars
           t.state_file = state_file
 
           t.no_color = no_color
-          t.no_backup = no_backup
-
-          t.backup_file = backup_file
+          t.no_print_output = no_print_output
 
           t.ensure_task = ensure_task
         end
