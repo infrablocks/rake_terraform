@@ -1,5 +1,6 @@
 require 'ruby_terraform'
 require 'ostruct'
+require 'colorize'
 require_relative '../tasklib'
 
 module RakeTerraform
@@ -32,7 +33,9 @@ module RakeTerraform
       def define
         desc "Plan #{configuration_name} using terraform"
         task name, argument_names => [ensure_task] do |_, args|
-          puts "Planning #{configuration_name}"
+          String.disable_colorization = no_color
+
+          puts "Planning #{configuration_name}".colorize(:cyan)
 
           configuration_directory = File.join(work_directory, source_directory)
 
