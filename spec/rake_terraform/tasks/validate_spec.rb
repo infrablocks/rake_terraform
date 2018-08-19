@@ -409,6 +409,7 @@ describe RakeTerraform::Tasks::Validate do
 
   def stub_ruby_terraform
     allow(RubyTerraform).to(receive(:clean))
+    allow(RubyTerraform).to(receive(:init))
     allow(RubyTerraform).to(receive(:validate))
   end
 end

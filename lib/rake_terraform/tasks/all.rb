@@ -17,6 +17,7 @@ module RakeTerraform
       parameter :backup_file
       parameter :plan_file
 
+      # Allows specifying rake task arguments, for example bucket:provision[my_deployment]
       parameter :argument_names
 
       parameter :ensure_task, :default => :'terraform:ensure'
