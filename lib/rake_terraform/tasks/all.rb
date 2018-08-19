@@ -32,6 +32,9 @@ module RakeTerraform
       parameter :destroy_task_name, :default => :destroy
       parameter :destroy_argument_names
 
+      parameter :output_task_name, :default => :output
+      parameter :output_argument_names
+
       def define
         Validate.new do |t|
           t.name = validate_task_name
@@ -92,6 +95,27 @@ module RakeTerraform
         Destroy.new do |t|
           t.name = destroy_task_name
           t.argument_names = destroy_argument_names || argument_names || []
+
+
+          t.configuration_name = configuration_name
+          t.source_directory = source_directory
+          t.work_directory = work_directory
+
+          t.backend_config = backend_config
+
+          t.vars = vars
+          t.state_file = state_file
+
+          t.no_color = no_color
+          t.no_backup = no_backup
+
+          t.backup_file = backup_file
+
+          t.ensure_task = ensure_task
+        end
+        Output.new do |t|
+          t.name = output_task_name
+          t.argument_names = output_argument_names || argument_names || []
 
 
           t.configuration_name = configuration_name
