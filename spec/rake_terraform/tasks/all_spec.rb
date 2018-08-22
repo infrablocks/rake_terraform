@@ -12,6 +12,7 @@ describe RakeTerraform::Tasks::All do
     expect(Rake::Task['network:plan']).not_to be_nil
     expect(Rake::Task['network:provision']).not_to be_nil
     expect(Rake::Task['network:destroy']).not_to be_nil
+    expect(Rake::Task['network:output']).not_to be_nil
   end
 
   context 'validate task' do
@@ -131,6 +132,36 @@ describe RakeTerraform::Tasks::All do
           .to(receive(:new).and_yield(validate_configurer))
       expect(validate_configurer)
           .to(receive(:state_file=).with(nil))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
+    it 'passes supplied value for debug when provided' do
+      debug = true
+
+      validate_configurer = stubbed_validate_configurer
+
+      allow(RakeTerraform::Tasks::Validate)
+          .to(receive(:new).and_yield(validate_configurer))
+      expect(validate_configurer)
+          .to(receive(:debug=).with(debug))
+
+      namespace :network do
+        define_tasks do |t|
+          t.debug = debug
+        end
+      end
+    end
+
+    it 'passes false for debug by default' do
+      validate_configurer = stubbed_validate_configurer
+
+      allow(RakeTerraform::Tasks::Validate)
+          .to(receive(:new).and_yield(validate_configurer))
+      expect(validate_configurer)
+          .to(receive(:debug=).with(false))
 
       namespace :network do
         define_tasks
@@ -416,6 +447,36 @@ describe RakeTerraform::Tasks::All do
       end
     end
 
+    it 'passes supplied value for debug when provided' do
+      debug = true
+
+      plan_configurer = stubbed_plan_configurer
+
+      allow(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:debug=).with(debug))
+
+      namespace :network do
+        define_tasks do |t|
+          t.debug = debug
+        end
+      end
+    end
+
+    it 'passes false for debug by default' do
+      plan_configurer = stubbed_plan_configurer
+
+      allow(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:debug=).with(false))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
     it 'passes supplied value for no_color when provided' do
       no_color = true
 
@@ -658,6 +719,36 @@ describe RakeTerraform::Tasks::All do
           .to(receive(:new).and_yield(provision_configurer))
       expect(provision_configurer)
           .to(receive(:state_file=).with(nil))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
+    it 'passes supplied value for debug when provided' do
+      debug = true
+
+      provision_configurer = stubbed_provision_configurer
+
+      allow(RakeTerraform::Tasks::Provision)
+          .to(receive(:new).and_yield(provision_configurer))
+      expect(provision_configurer)
+          .to(receive(:debug=).with(debug))
+
+      namespace :network do
+        define_tasks do |t|
+          t.debug = debug
+        end
+      end
+    end
+
+    it 'passes false for debug by default' do
+      provision_configurer = stubbed_provision_configurer
+
+      allow(RakeTerraform::Tasks::Provision)
+          .to(receive(:new).and_yield(provision_configurer))
+      expect(provision_configurer)
+          .to(receive(:debug=).with(false))
 
       namespace :network do
         define_tasks
@@ -972,6 +1063,36 @@ describe RakeTerraform::Tasks::All do
       end
     end
 
+    it 'passes supplied value for debug when provided' do
+      debug = true
+
+      destroy_configurer = stubbed_destroy_configurer
+
+      allow(RakeTerraform::Tasks::Destroy)
+          .to(receive(:new).and_yield(destroy_configurer))
+      expect(destroy_configurer)
+          .to(receive(:debug=).with(debug))
+
+      namespace :network do
+        define_tasks do |t|
+          t.debug = debug
+        end
+      end
+    end
+
+    it 'passes false for debug by default' do
+      destroy_configurer = stubbed_destroy_configurer
+
+      allow(RakeTerraform::Tasks::Destroy)
+          .to(receive(:new).and_yield(destroy_configurer))
+      expect(destroy_configurer)
+          .to(receive(:debug=).with(false))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
     it 'passes supplied value for no_color when provided' do
       no_color = true
 
@@ -1019,13 +1140,13 @@ describe RakeTerraform::Tasks::All do
       end
     end
 
-    it 'passes false for no_color by default' do
+    it 'passes false for no_backup by default' do
       destroy_configurer = stubbed_destroy_configurer
 
       allow(RakeTerraform::Tasks::Destroy)
           .to(receive(:new).and_yield(destroy_configurer))
       expect(destroy_configurer)
-          .to(receive(:no_color=).with(false))
+          .to(receive(:no_backup=).with(false))
 
       namespace :network do
         define_tasks
@@ -1157,6 +1278,280 @@ describe RakeTerraform::Tasks::All do
     end
   end
 
+  context 'output task' do
+    it 'configures with the provided configuration name ' +
+           'source directory and work directory' do
+      configuration_name = 'network'
+      source_directory = 'infra/network'
+      work_directory = 'build'
+
+      output_configurer = stubbed_output_configurer
+
+      expect(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:configuration_name=).with(configuration_name))
+      expect(output_configurer)
+          .to(receive(:work_directory=).with(work_directory))
+      expect(output_configurer)
+          .to(receive(:source_directory=).with(source_directory))
+
+      namespace :network do
+        define_tasks do |t|
+          t.configuration_name = configuration_name
+          t.source_directory = source_directory
+          t.work_directory = work_directory
+        end
+      end
+    end
+
+    it 'passes backend configuration when present' do
+      backend_config = {
+          bucket: 'some-bucket'
+      }
+
+      output_configurer = stubbed_output_configurer
+
+      allow(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:backend_config=).with(backend_config))
+
+      namespace :network do
+        define_tasks do |t|
+          t.backend_config = backend_config
+        end
+      end
+    end
+
+    it 'passes nil for backend when no backend configuration present' do
+      output_configurer = stubbed_output_configurer
+
+      allow(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:backend_config=).with(nil))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
+    it 'passes state file when present' do
+      state_file = 'infra/terraform.tfstate'
+
+      output_configurer = stubbed_output_configurer
+
+      allow(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:state_file=).with(state_file))
+
+      namespace :network do
+        define_tasks do |t|
+          t.state_file = state_file
+        end
+      end
+    end
+
+    it 'passes nil for state file when no state file present' do
+      output_configurer = stubbed_output_configurer
+
+      allow(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:state_file=).with(nil))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
+    it 'passes supplied value for debug when provided' do
+      debug = true
+
+      output_configurer = stubbed_output_configurer
+
+      allow(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:debug=).with(debug))
+
+      namespace :network do
+        define_tasks do |t|
+          t.debug = debug
+        end
+      end
+    end
+
+    it 'passes false for debug by default' do
+      output_configurer = stubbed_output_configurer
+
+      allow(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:debug=).with(false))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
+    it 'passes supplied value for no_color when provided' do
+      no_color = true
+
+      output_configurer = stubbed_output_configurer
+
+      allow(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:no_color=).with(no_color))
+
+      namespace :network do
+        define_tasks do |t|
+          t.no_color = no_color
+        end
+      end
+    end
+
+    it 'passes false for no_color by default' do
+      output_configurer = stubbed_output_configurer
+
+      allow(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:no_color=).with(false))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
+    it 'passes supplied value for no_print_output when provided' do
+      no_print_output = true
+
+      output_configurer = stubbed_output_configurer
+
+      allow(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:no_print_output=).with(no_print_output))
+
+      namespace :network do
+        define_tasks do |t|
+          t.no_print_output = no_print_output
+        end
+      end
+    end
+
+    it 'passes false for no_print_output by default' do
+      output_configurer = stubbed_output_configurer
+
+      allow(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:no_print_output=).with(false))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
+    it 'passes provided ensure task when present' do
+      ensure_task = :'tooling:terraform:ensure'
+
+      output_configurer = stubbed_output_configurer
+
+      allow(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:ensure_task=).with(ensure_task))
+
+      namespace :network do
+        define_tasks do |t|
+          t.ensure_task = ensure_task
+        end
+      end
+    end
+
+    it 'passes terraform:ensure for ensure task by default' do
+      output_configurer = stubbed_output_configurer
+
+      allow(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:ensure_task=).with(:'terraform:ensure'))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
+    it 'uses a name of output by default' do
+      output_configurer = stubbed_output_configurer
+
+      expect(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:name=).with(:output))
+
+      define_tasks
+    end
+
+    it 'uses the provided name when supplied' do
+      output_configurer = stubbed_output_configurer
+
+      expect(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:name=).with(:deploy))
+
+      define_tasks do |t|
+        t.output_task_name = :deploy
+      end
+    end
+
+    it 'passes the provided output argument names when supplied' do
+      output_configurer = stubbed_output_configurer
+
+      expect(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:argument_names=).with([:deployment_identifier, :region]))
+
+      define_tasks do |t|
+        t.output_argument_names = [:deployment_identifier, :region]
+      end
+    end
+
+    it 'passes the provided argument names when supplied' do
+      output_configurer = stubbed_output_configurer
+
+      expect(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:argument_names=).with([:deployment_identifier, :region]))
+
+      define_tasks do |t|
+        t.argument_names = [:deployment_identifier, :region]
+      end
+    end
+
+    it 'gives preference to the output argument names when argument names also provided' do
+      output_configurer = stubbed_output_configurer
+
+      expect(RakeTerraform::Tasks::Output)
+          .to(receive(:new).and_yield(output_configurer))
+      expect(output_configurer)
+          .to(receive(:argument_names=).with([:deployment_identifier]))
+
+      define_tasks do |t|
+        t.argument_names = [:deployment_identifier, :region]
+        t.output_argument_names = [:deployment_identifier]
+      end
+    end
+  end
+
   def define_tasks(&block)
     subject.new do |t|
       t.configuration_name = 'network'
@@ -1180,7 +1575,7 @@ describe RakeTerraform::Tasks::All do
         :name=, :argument_names=, :backend_config=,
         :configuration_name=, :source_directory=, :work_directory=,
         :vars=, :state_file=,
-        :no_color=,
+        :debug=, :no_color=,
         :ensure_task=)
   end
 
@@ -1189,7 +1584,7 @@ describe RakeTerraform::Tasks::All do
         :name=, :argument_names=, :backend_config=,
         :configuration_name=, :source_directory=, :work_directory=,
         :vars=, :state_file=,
-        :no_color=, :plan_file=, :destroy=,
+        :debug=, :no_color=, :plan_file=, :destroy=,
         :ensure_task=)
   end
 
@@ -1198,7 +1593,7 @@ describe RakeTerraform::Tasks::All do
         :name=, :argument_names=, :backend_config=,
         :configuration_name=, :source_directory=, :work_directory=,
         :vars=, :state_file=,
-        :no_color=, :no_backup=, :backup_file=,
+        :debug=, :no_color=, :no_backup=, :backup_file=,
         :ensure_task=)
   end
 
@@ -1207,7 +1602,16 @@ describe RakeTerraform::Tasks::All do
         :name=, :argument_names=, :backend_config=,
         :configuration_name=, :source_directory=, :work_directory=,
         :vars=, :state_file=,
-        :no_color=, :no_backup=, :backup_file=,
+        :debug=, :no_color=, :no_backup=, :backup_file=,
+        :ensure_task=)
+  end
+
+  def stubbed_output_configurer
+    double_allowing(
+        :name=, :argument_names=, :backend_config=,
+        :configuration_name=, :source_directory=, :work_directory=,
+        :vars=, :state_file=,
+        :debug=, :no_color=, :no_print_output=,
         :ensure_task=)
   end
 end

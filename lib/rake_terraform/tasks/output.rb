@@ -5,8 +5,8 @@ require_relative '../tasklib'
 
 module RakeTerraform
   module Tasks
-    class Destroy < TaskLib
-      parameter :name, :default => :destroy
+    class Output < TaskLib
+      parameter :name, :default => :output
       parameter :argument_names, :default => []
 
       parameter :configuration_name, :required => true
@@ -15,14 +15,11 @@ module RakeTerraform
 
       parameter :backend_config
 
-      parameter :vars, default: {}
       parameter :state_file
 
       parameter :debug, :default => false
       parameter :no_color, :default => false
-      parameter :no_backup, :default => false
-
-      parameter :backup_file
+      parameter :no_print_output, :default => false
 
       parameter :ensure_task, :default => :'terraform:ensure'
 
@@ -31,11 +28,11 @@ module RakeTerraform
       end
 
       def define
-        desc "Destroy #{configuration_name} using terraform"
+        desc "Output #{configuration_name} using terraform"
         task name, argument_names => [ensure_task] do |_, args|
           String.disable_colorization = no_color
 
-          puts "Destroying #{configuration_name}".colorize(:cyan)
+          puts "Output of #{configuration_name}".colorize(:cyan)
 
           configuration_directory = File.join(work_directory, source_directory)
 
@@ -48,17 +45,13 @@ module RakeTerraform
               state_file: state_file,
               debug: debug,
               no_color: no_color,
-              no_backup: no_backup,
-              backup_file: backup_file,
+              no_print_output: no_print_output,
           })
 
           derived_backend_config = backend_config.respond_to?(:call) ?
               backend_config.call(
                   *[args, params].slice(0, backend_config.arity)) :
               backend_config
-          derived_vars = vars.respond_to?(:call) ?
-              vars.call(*[args, params].slice(0, vars.arity)) :
-              vars
           derived_state_file = state_file.respond_to?(:call) ?
               state_file.call(
                   *[args, params].slice(0, state_file.arity)) :
@@ -74,13 +67,14 @@ module RakeTerraform
             RubyTerraform.init(
                 backend_config: derived_backend_config,
                 no_color: no_color)
-            RubyTerraform.destroy(
-                force: true,
+
+            output = RubyTerraform.output(
                 no_color: no_color,
-                no_backup: no_backup,
-                backup: backup_file,
-                state: derived_state_file,
-                vars: derived_vars)
+                state: derived_state_file)
+
+            puts output unless no_print_output
+
+            output
           end
         end
       end

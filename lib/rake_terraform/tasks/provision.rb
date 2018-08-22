@@ -1,5 +1,6 @@
 require 'ruby_terraform'
 require 'ostruct'
+require 'colorize'
 require_relative '../tasklib'
 
 module RakeTerraform
@@ -17,6 +18,7 @@ module RakeTerraform
       parameter :vars, default: {}
       parameter :state_file
 
+      parameter :debug, :default => false
       parameter :no_color, :default => false
       parameter :no_backup, :default => false
 
@@ -31,6 +33,10 @@ module RakeTerraform
       def define
         desc "Provision #{configuration_name} using terraform"
         task name, argument_names => [ensure_task] do |_, args|
+          String.disable_colorization = no_color
+
+          puts "Provisioning #{configuration_name}".colorize(:cyan)
+
           configuration_directory = File.join(work_directory, source_directory)
 
           params = OpenStruct.new({
@@ -40,24 +46,23 @@ module RakeTerraform
               configuration_directory: configuration_directory,
               backend_config: backend_config,
               state_file: state_file,
+              debug: debug,
               no_color: no_color,
               no_backup: no_backup,
-              backup_file: backup_file
+              backup_file: backup_file,
           })
 
-          derived_vars = vars.respond_to?(:call) ?
-              vars.call(*[args, params].slice(0, vars.arity)) :
-              vars
           derived_backend_config = backend_config.respond_to?(:call) ?
               backend_config.call(
                   *[args, params].slice(0, backend_config.arity)) :
               backend_config
+          derived_vars = vars.respond_to?(:call) ?
+              vars.call(*[args, params].slice(0, vars.arity)) :
+              vars
           derived_state_file = state_file.respond_to?(:call) ?
               state_file.call(
                   *[args, params].slice(0, state_file.arity)) :
               state_file
-
-          puts "Provisioning #{configuration_name}"
 
           RubyTerraform.clean(
               directory: configuration_directory)
