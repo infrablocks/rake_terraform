@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     rake_terraform (0.18.0)
-      colorize
+      colorize (~> 0.8)
       rake_dependencies (~> 0.15)
       ruby-terraform (~> 0.11)
 
