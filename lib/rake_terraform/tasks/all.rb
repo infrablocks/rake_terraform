@@ -8,6 +8,7 @@ module RakeTerraform
       parameter :backend_config
 
       parameter :vars
+      parameter :var_file
       parameter :state_file
 
       # Emit additional information for debugging purposes
@@ -53,6 +54,7 @@ module RakeTerraform
           t.backend_config = backend_config
 
           t.vars = vars
+          t.var_file = var_file
           t.state_file = state_file
 
           t.debug = debug
@@ -71,6 +73,7 @@ module RakeTerraform
           t.backend_config = backend_config
 
           t.vars = vars
+          t.var_file = var_file
           t.state_file = state_file
 
           t.debug = debug
@@ -91,6 +94,7 @@ module RakeTerraform
           t.backend_config = backend_config
 
           t.vars = vars
+          t.var_file = var_file
           t.state_file = state_file
 
           t.debug = debug
@@ -112,6 +116,7 @@ module RakeTerraform
           t.backend_config = backend_config
 
           t.vars = vars
+          t.var_file = var_file
           t.state_file = state_file
 
           t.debug = debug

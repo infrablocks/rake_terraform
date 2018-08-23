@@ -4,7 +4,7 @@ PATH
     rake_terraform (0.18.0)
       colorize (~> 0.8)
       rake_dependencies (~> 0.15)
-      ruby-terraform (~> 0.11)
+      ruby-terraform (>= 0.11.2)
 
 GEM
   remote: https://rubygems.org/
@@ -68,4 +68,4 @@ DEPENDENCIES
   rspec (~> 3.0)
 
 BUNDLED WITH
-   1.16.3
+   1.16.4

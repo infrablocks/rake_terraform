@@ -16,6 +16,7 @@ module RakeTerraform
       parameter :backend_config
 
       parameter :vars, default: {}
+      parameter :var_file
       parameter :state_file
 
       parameter :debug, :default => false
@@ -35,6 +36,12 @@ module RakeTerraform
           puts "Validating #{configuration_name}".colorize(:cyan)
 
           configuration_directory = File.join(work_directory, source_directory)
+
+          RubyTerraform.clean(
+              directory: configuration_directory)
+
+          mkdir_p File.dirname(configuration_directory)
+          cp_r source_directory, configuration_directory
 
           params = OpenStruct.new({
               configuration_name: configuration_name,
@@ -59,12 +66,6 @@ module RakeTerraform
                   *[args, params].slice(0, state_file.arity)) :
               state_file
 
-          RubyTerraform.clean(
-              directory: configuration_directory)
-
-          mkdir_p File.dirname(configuration_directory)
-          cp_r source_directory, configuration_directory
-
           Dir.chdir(configuration_directory) do
             RubyTerraform.init(
                 backend_config: derived_backend_config,
@@ -72,7 +73,8 @@ module RakeTerraform
             RubyTerraform.validate(
                 no_color: no_color,
                 state: derived_state_file,
-                vars: derived_vars)
+                vars: derived_vars,
+                var_file: var_file)
           end
         end
       end

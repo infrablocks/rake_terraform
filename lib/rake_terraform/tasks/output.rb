@@ -36,6 +36,12 @@ module RakeTerraform
 
           configuration_directory = File.join(work_directory, source_directory)
 
+          RubyTerraform.clean(
+              directory: configuration_directory)
+
+          mkdir_p File.dirname(configuration_directory)
+          cp_r source_directory, configuration_directory
+
           params = OpenStruct.new({
               configuration_name: configuration_name,
               source_directory: source_directory,
@@ -56,12 +62,6 @@ module RakeTerraform
               state_file.call(
                   *[args, params].slice(0, state_file.arity)) :
               state_file
-
-          RubyTerraform.clean(
-              directory: configuration_directory)
-
-          mkdir_p File.dirname(configuration_directory)
-          cp_r source_directory, configuration_directory
 
           Dir.chdir(configuration_directory) do
             RubyTerraform.init(
