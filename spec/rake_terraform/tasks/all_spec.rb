@@ -108,6 +108,36 @@ describe RakeTerraform::Tasks::All do
       end
     end
 
+    it 'passes var file when present' do
+      var_file = 'some/terraform.tfvars'
+
+      validate_configurer = stubbed_validate_configurer
+
+      allow(RakeTerraform::Tasks::Validate)
+          .to(receive(:new).and_yield(validate_configurer))
+      expect(validate_configurer)
+          .to(receive(:var_file=).with(var_file))
+
+      namespace :network do
+        define_tasks do |t|
+          t.var_file = var_file
+        end
+      end
+    end
+
+    it 'passes nil for var file when no var file present' do
+      validate_configurer = stubbed_validate_configurer
+
+      allow(RakeTerraform::Tasks::Validate)
+          .to(receive(:new).and_yield(validate_configurer))
+      expect(validate_configurer)
+          .to(receive(:var_file=).with(nil))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
     it 'passes state file when present' do
       state_file = 'infra/terraform.tfstate'
 
@@ -381,6 +411,36 @@ describe RakeTerraform::Tasks::All do
           .to(receive(:new).and_yield(plan_configurer))
       expect(plan_configurer)
           .to(receive(:vars=).with(nil))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
+    it 'passes var file when present' do
+      var_file = 'some/terraform.tfvars'
+
+      plan_configurer = stubbed_plan_configurer
+
+      allow(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:var_file=).with(var_file))
+
+      namespace :network do
+        define_tasks do |t|
+          t.var_file = var_file
+        end
+      end
+    end
+
+    it 'passes nil for var file when no var file present' do
+      plan_configurer = stubbed_plan_configurer
+
+      allow(RakeTerraform::Tasks::Plan)
+          .to(receive(:new).and_yield(plan_configurer))
+      expect(plan_configurer)
+          .to(receive(:var_file=).with(nil))
 
       namespace :network do
         define_tasks
@@ -689,6 +749,36 @@ describe RakeTerraform::Tasks::All do
           .to(receive(:new).and_yield(provision_configurer))
       expect(provision_configurer)
           .to(receive(:vars=).with(nil))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
+    it 'passes var file when present' do
+      var_file = 'some/terraform.tfvars'
+
+      provision_configurer = stubbed_provision_configurer
+
+      allow(RakeTerraform::Tasks::Provision)
+          .to(receive(:new).and_yield(provision_configurer))
+      expect(provision_configurer)
+          .to(receive(:var_file=).with(var_file))
+
+      namespace :network do
+        define_tasks do |t|
+          t.var_file = var_file
+        end
+      end
+    end
+
+    it 'passes nil for var file when no var file present' do
+      provision_configurer = stubbed_provision_configurer
+
+      allow(RakeTerraform::Tasks::Provision)
+          .to(receive(:new).and_yield(provision_configurer))
+      expect(provision_configurer)
+          .to(receive(:var_file=).with(nil))
 
       namespace :network do
         define_tasks
@@ -1027,6 +1117,36 @@ describe RakeTerraform::Tasks::All do
           .to(receive(:new).and_yield(destroy_configurer))
       expect(destroy_configurer)
           .to(receive(:vars=).with(nil))
+
+      namespace :network do
+        define_tasks
+      end
+    end
+
+    it 'passes var file when present' do
+      var_file = 'some/terraform.tfvars'
+
+      destroy_configurer = stubbed_destroy_configurer
+
+      allow(RakeTerraform::Tasks::Destroy)
+          .to(receive(:new).and_yield(destroy_configurer))
+      expect(destroy_configurer)
+          .to(receive(:var_file=).with(var_file))
+
+      namespace :network do
+        define_tasks do |t|
+          t.var_file = var_file
+        end
+      end
+    end
+
+    it 'passes nil for var file when no var file present' do
+      destroy_configurer = stubbed_destroy_configurer
+
+      allow(RakeTerraform::Tasks::Destroy)
+          .to(receive(:new).and_yield(destroy_configurer))
+      expect(destroy_configurer)
+          .to(receive(:var_file=).with(nil))
 
       namespace :network do
         define_tasks
@@ -1574,7 +1694,7 @@ describe RakeTerraform::Tasks::All do
     double_allowing(
         :name=, :argument_names=, :backend_config=,
         :configuration_name=, :source_directory=, :work_directory=,
-        :vars=, :state_file=,
+        :vars=, :var_file=, :state_file=,
         :debug=, :no_color=,
         :ensure_task=)
   end
@@ -1583,7 +1703,7 @@ describe RakeTerraform::Tasks::All do
     double_allowing(
         :name=, :argument_names=, :backend_config=,
         :configuration_name=, :source_directory=, :work_directory=,
-        :vars=, :state_file=,
+        :vars=, :var_file=, :state_file=,
         :debug=, :no_color=, :plan_file=, :destroy=,
         :ensure_task=)
   end
@@ -1592,7 +1712,7 @@ describe RakeTerraform::Tasks::All do
     double_allowing(
         :name=, :argument_names=, :backend_config=,
         :configuration_name=, :source_directory=, :work_directory=,
-        :vars=, :state_file=,
+        :vars=, :var_file=, :state_file=,
         :debug=, :no_color=, :no_backup=, :backup_file=,
         :ensure_task=)
   end
@@ -1601,7 +1721,7 @@ describe RakeTerraform::Tasks::All do
     double_allowing(
         :name=, :argument_names=, :backend_config=,
         :configuration_name=, :source_directory=, :work_directory=,
-        :vars=, :state_file=,
+        :vars=, :var_file=, :state_file=,
         :debug=, :no_color=, :no_backup=, :backup_file=,
         :ensure_task=)
   end

@@ -16,6 +16,7 @@ module RakeTerraform
       parameter :backend_config
 
       parameter :vars, default: {}
+      parameter :var_file
       parameter :state_file
 
       parameter :debug, :default => false
@@ -39,12 +40,19 @@ module RakeTerraform
 
           configuration_directory = File.join(work_directory, source_directory)
 
+          RubyTerraform.clean(
+              directory: configuration_directory)
+
+          mkdir_p File.dirname(configuration_directory)
+          cp_r source_directory, configuration_directory
+
           params = OpenStruct.new({
               configuration_name: configuration_name,
               source_directory: source_directory,
               work_directory: work_directory,
               configuration_directory: configuration_directory,
               backend_config: backend_config,
+              var_file: var_file,
               state_file: state_file,
               debug: debug,
               no_color: no_color,
@@ -64,17 +72,6 @@ module RakeTerraform
                   *[args, params].slice(0, state_file.arity)) :
               state_file
 
-          RubyTerraform.clean(
-              directory: configuration_directory)
-
-          mkdir_p File.dirname(configuration_directory)
-          cp_r source_directory, configuration_directory
-
-          var_file = File.join(configuration_directory, "terraform.tfvars")
-          File.open(var_file, 'w') do |file|
-            derived_vars.each{ |k, v| file.write("#{k} = \"#{v}\"\n") }
-          end
-
           Dir.chdir(configuration_directory) do
             RubyTerraform.init(
                 backend_config: derived_backend_config,
@@ -85,7 +82,8 @@ module RakeTerraform
                 no_backup: no_backup,
                 backup: backup_file,
                 state: derived_state_file,
-                var_file: "terraform.tfvars")
+                vars: derived_vars,
+                var_file: var_file)
           end
         end
       end

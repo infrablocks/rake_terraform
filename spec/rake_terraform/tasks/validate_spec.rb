@@ -300,6 +300,30 @@ describe RakeTerraform::Tasks::Validate do
     Rake::Task['validate'].invoke('staging')
   end
 
+  it 'uses the provided var file when present' do
+    var_file = 'some/terraform.tfvars'
+
+    subject.new do |t|
+      t.configuration_name = 'network'
+      t.source_directory = 'infra/network'
+      t.work_directory = 'build'
+
+      t.var_file = var_file
+    end
+
+    stub_puts
+    stub_chdir
+    stub_cp_r
+    stub_mkdir_p
+    stub_ruby_terraform
+
+    expect(RubyTerraform)
+        .to(receive(:validate)
+                .with(hash_including(var_file: var_file)))
+
+    Rake::Task['validate'].invoke
+  end
+
   it 'uses the provided state file when present' do
     state_file = 'some/state.tfstate'
 
