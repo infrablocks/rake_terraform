@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary = 'Rake tasks for running terraform.'
   spec.description = 'Provides rake tasks for executing terraform commands as part of a rake build.'
-  spec.homepage = 'https://github.com/tobyclemson/rake_terraform'
+  spec.homepage = 'https://github.com/infrablocks/rake_terraform'
   spec.license = 'MIT'
 
   spec.files = `git ls-files -z`.split("\x0").reject do |f|
