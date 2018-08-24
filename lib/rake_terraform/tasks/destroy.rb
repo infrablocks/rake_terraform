@@ -1,6 +1,6 @@
 require 'ruby_terraform'
 require 'ostruct'
-require 'colorize'
+require 'colored2'
 require_relative '../tasklib'
 
 module RakeTerraform
@@ -34,9 +34,9 @@ module RakeTerraform
       def define
         desc "Destroy #{configuration_name} using terraform"
         task name, argument_names => [ensure_task] do |_, args|
-          String.disable_colorization = no_color
+          Colored2.disable! if no_color
 
-          puts "Destroying #{configuration_name}".colorize(:cyan)
+          puts "Destroying #{configuration_name}".cyan
 
           configuration_directory = File.join(work_directory, source_directory)
 
