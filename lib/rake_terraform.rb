@@ -113,7 +113,7 @@ module RakeTerraform
 
               logger.info(
                   "Terraform provider binary for: #{name} should be at: " +
-                      terraform_binary)
+                      provider_binary)
 
               binary_exists = File.exists?(provider_binary)
 
