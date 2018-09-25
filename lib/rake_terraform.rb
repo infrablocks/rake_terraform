@@ -1,8 +1,14 @@
+require 'logger'
 require 'rake_dependencies'
 require 'ruby_terraform'
 require 'rake_terraform/version'
 require 'rake_terraform/tasklib'
 require 'rake_terraform/tasks'
+
+require 'logger'
+
+logger = Logger.new(STDERR)
+logger.level = Logger.const_get(ENV['RKTF_DEBUG'] || 'WARN')
 
 module RakeTerraform
   include RubyTerraform
@@ -42,11 +48,21 @@ module RakeTerraform
             'terraform')
         version_string = StringIO.new
 
+        logger.debug("Terraform binary is at: #{terraform_binary}")
+
         if File.exist?(terraform_binary)
-          Lino::CommandLineBuilder.for_command(terraform_binary)
+          command_line = Lino::CommandLineBuilder.for_command(terraform_binary)
               .with_flag('-version')
               .build
-              .execute(stdout: version_string)
+
+          logger.debug(
+              'Fetching terraform version information using command: ' +
+                  "#{command_line}")
+
+          command_line.execute(stdout: version_string)
+
+          logger.debug(
+              "Terraform version information is: \n#{version_string.string}")
 
           if version_string.string.lines.first =~ /#{version}/
             return false
