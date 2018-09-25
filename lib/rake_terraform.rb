@@ -5,11 +5,6 @@ require 'rake_terraform/version'
 require 'rake_terraform/tasklib'
 require 'rake_terraform/tasks'
 
-require 'logger'
-
-logger = Logger.new(STDERR)
-logger.level = Logger.const_get(ENV['RKTF_DEBUG'] || 'WARN')
-
 module RakeTerraform
   include RubyTerraform
 
@@ -42,6 +37,9 @@ module RakeTerraform
           'terraform_<%= @version %>_<%= @os_id %>_amd64<%= @ext %>'
 
       t.needs_fetch = lambda do |parameters|
+        logger = Logger.new(STDERR)
+        logger.level = Logger.const_get(ENV['RKTF_LOG'] || 'WARN')
+
         terraform_binary = File.join(
             parameters[:path],
             parameters[:binary_directory],
