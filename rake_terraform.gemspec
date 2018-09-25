@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'rake_dependencies', '~> 0.15'
+  spec.add_dependency 'rake_dependencies', '~> 0.18'
   spec.add_dependency 'ruby-terraform', '>= 0.11.2'
   spec.add_dependency 'colored2', '~> 3.1'
 
