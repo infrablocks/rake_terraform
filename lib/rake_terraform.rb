@@ -13,6 +13,9 @@ module RakeTerraform
   end
 
   def self.define_installation_tasks(opts = {})
+    logger = opts[:logger] ||
+        Logger.new(STDERR, Logger.const_get(ENV['RKTF_LOG'] || 'WARN'))
+
     namespace = opts[:namespace] || :terraform
     version = opts[:version] || '0.10.3'
     path = opts[:path] || File.join('vendor', 'terraform')
@@ -37,16 +40,13 @@ module RakeTerraform
           'terraform_<%= @version %>_<%= @os_id %>_amd64<%= @ext %>'
 
       t.needs_fetch = lambda do |parameters|
-        logger = Logger.new(STDERR)
-        logger.level = Logger.const_get(ENV['RKTF_LOG'] || 'WARN')
-
         terraform_binary = File.join(
             parameters[:path],
             parameters[:binary_directory],
             'terraform')
         version_string = StringIO.new
 
-        logger.debug("Terraform binary is at: #{terraform_binary}")
+        logger.debug("Terraform binary should be at: #{terraform_binary}")
 
         if File.exist?(terraform_binary)
           command_line = Lino::CommandLineBuilder.for_command(terraform_binary)
@@ -62,9 +62,14 @@ module RakeTerraform
           logger.debug(
               "Terraform version information is: \n#{version_string.string}")
 
-          if version_string.string.lines.first =~ /#{version}/
-            return false
-          end
+          version_line = version_string.string.lines.first
+          version_is_correct = version_line =~ /#{version}/
+
+          logger.trace(
+              "Version: '#{version}' is in version line: '#{version_line}'?: " +
+                  "#{version_is_correct}")
+
+          return !version_is_correct
         end
 
         return true
@@ -101,11 +106,20 @@ module RakeTerraform
             t.installation_directory = "#{ENV['HOME']}/.terraform.d/plugins"
 
             t.needs_fetch = lambda do |parameters|
-              !File.exists?(
-                  File.join(
-                      parameters[:path],
-                      parameters[:binary_directory],
-                      "#{dependency}_v#{parameters[:version]}"))
+              provider_binary = File.join(
+                  parameters[:path],
+                  parameters[:binary_directory],
+                  "#{dependency}_v#{parameters[:version]}")
+
+              logger.debug(
+                  "Terraform provider binary for: #{name} should be at: " +
+                      terraform_binary)
+
+              binary_exists = File.exists?(provider_binary)
+
+              logger.trace("Provider file exists?: #{binary_exists}")
+
+              !binary_exists
             end
           end
         end
