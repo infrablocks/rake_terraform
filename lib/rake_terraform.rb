@@ -14,7 +14,7 @@ module RakeTerraform
 
   def self.define_installation_tasks(opts = {})
     logger = opts[:logger] ||
-        Logger.new(STDERR, Logger.const_get(ENV['RKTF_LOG'] || 'WARN'))
+        Logger.new(STDERR, level: Logger.const_get(ENV['RKTF_LOG'] || 'WARN'))
 
     namespace = opts[:namespace] || :terraform
     version = opts[:version] || '0.10.3'
