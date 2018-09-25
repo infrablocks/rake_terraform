@@ -76,27 +76,24 @@ module RakeTerraform
       end
     end
     providers.each do |provider|
-      name = provider[:name]
-      version = provider[:version]
-      path = provider[:path]
-      repository = provider[:repository]
-      dependency = "terraform-provider-#{name}"
+      dependency = "terraform-provider-#{provider[:name]}"
 
       Rake.application.in_namespace namespace do
         Rake.application.in_namespace :providers do
           RakeDependencies::Tasks::All.new do |t|
-            t.namespace = name
+            t.namespace = provider[:name]
             t.dependency = dependency
-            t.version = version
-            t.path = path
+            t.version = provider[:version]
+            t.path = provider[:path]
             t.type = :tar_gz
 
             t.os_ids = {mac: 'darwin', linux: 'linux'}
 
             t.uri_template =
-                "https://github.com/#{repository}/releases/download/" +
-                    "<%= @version %>/#{dependency}_v<%= @version %>_" +
-                    "<%= @os_id %>_amd64<%= @ext %>"
+                "https://github.com/#{provider[:repository]}/releases/" +
+                    "download/<%= @version %>/" +
+                    "#{dependency}_v<%= @version %>_<%= @os_id %>" +
+                    "_amd64<%= @ext %>"
             t.file_name_template =
                 "#{dependency}_v<%= @version %>_<%= @os_id %>_amd64<%= @ext %>"
 
@@ -112,8 +109,8 @@ module RakeTerraform
                   "#{dependency}_v#{parameters[:version]}")
 
               logger.info(
-                  "Terraform provider binary for: #{name} should be at: " +
-                      provider_binary)
+                  "Terraform provider binary for: #{provider[:name]} " +
+                      "should be at: #{provider_binary}")
 
               binary_exists = File.exists?(provider_binary)
 
