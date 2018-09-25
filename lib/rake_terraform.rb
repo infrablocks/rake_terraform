@@ -46,26 +46,26 @@ module RakeTerraform
             'terraform')
         version_string = StringIO.new
 
-        logger.debug("Terraform binary should be at: #{terraform_binary}")
+        logger.info("Terraform binary should be at: #{terraform_binary}")
 
         if File.exist?(terraform_binary)
           command_line = Lino::CommandLineBuilder.for_command(terraform_binary)
               .with_flag('-version')
               .build
 
-          logger.debug(
+          logger.info(
               'Fetching terraform version information using command: ' +
                   "#{command_line}")
 
           command_line.execute(stdout: version_string)
 
-          logger.debug(
+          logger.info(
               "Terraform version information is: \n#{version_string.string}")
 
           version_line = version_string.string.lines.first
           version_is_correct = version_line =~ /#{version}/
 
-          logger.trace(
+          logger.debug(
               "Version: '#{version}' is in version line: '#{version_line}'?: " +
                   "#{version_is_correct}")
 
@@ -111,13 +111,13 @@ module RakeTerraform
                   parameters[:binary_directory],
                   "#{dependency}_v#{parameters[:version]}")
 
-              logger.debug(
+              logger.info(
                   "Terraform provider binary for: #{name} should be at: " +
                       terraform_binary)
 
               binary_exists = File.exists?(provider_binary)
 
-              logger.trace("Provider file exists?: #{binary_exists}")
+              logger.debug("Provider file exists?: #{binary_exists}")
 
               !binary_exists
             end
