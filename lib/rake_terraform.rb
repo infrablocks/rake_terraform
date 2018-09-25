@@ -15,6 +15,7 @@ module RakeTerraform
     namespace = opts[:namespace] || :terraform
     version = opts[:version] || '0.10.3'
     path = opts[:path] || File.join('vendor', 'terraform')
+    providers = opts[:providers] || []
 
     RubyTerraform.configure do |c|
       c.binary = File.join(path, 'bin', 'terraform')
@@ -55,5 +56,49 @@ module RakeTerraform
         return true
       end
     end
+    providers.each do |provider|
+      name = provider[:name]
+      version = provider[:version]
+      path = provider[:path]
+      repository = provider[:repository]
+      dependency = "terraform-provider-#{name}"
+
+      Rake.application.in_namespace namespace do
+        Rake.application.in_namespace :providers do
+          RakeDependencies::Tasks::All.new do |t|
+            t.namespace = name
+            t.dependency = dependency
+            t.version = version
+            t.path = path
+            t.type = :tar_gz
+
+            t.os_ids = {mac: 'darwin', linux: 'linux'}
+
+            t.uri_template =
+                "https://github.com/#{repository}/releases/download/" +
+                    "<%= @version %>/#{dependency}_v<%= @version %>_" +
+                    "<%= @os_id %>_amd64<%= @ext %>"
+            t.file_name_template =
+                "#{dependency}_v<%= @version %>_<%= @os_id %>_amd64<%= @ext %>"
+
+            t.source_binary_name_template = dependency
+            t.target_binary_name_template = "#{dependency}_v<%= @version %>"
+
+            t.installation_directory = "#{ENV['HOME']}/.terraform.d/plugins"
+
+            t.needs_fetch = lambda do |parameters|
+              !File.exists?(
+                  File.join(
+                      parameters[:path],
+                      parameters[:binary_directory],
+                      "#{dependency}_v#{parameters[:version]}"))
+            end
+          end
+        end
+      end
+    end
+    Rake::Task["#{namespace}:ensure"]
+        .enhance(providers.map {|provider|
+          "#{namespace}:providers:#{provider[:name]}:ensure"})
   end
 end
