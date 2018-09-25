@@ -84,7 +84,7 @@ module RakeTerraform
             t.namespace = provider[:name]
             t.dependency = dependency
             t.version = provider[:version]
-            t.path = provider[:path]
+            t.path = provider[:path] || File.join('vendor', dependency)
             t.type = :tar_gz
 
             t.os_ids = {mac: 'darwin', linux: 'linux'}

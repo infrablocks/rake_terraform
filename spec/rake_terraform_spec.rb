@@ -382,6 +382,31 @@ RSpec.describe RakeTerraform do
         })
       end
 
+      it 'defaults the path when none provided' do
+        terraform_task = stubbed_rake_dependencies_all_task
+        provider_task_1 = stubbed_rake_dependencies_all_task
+
+        allow(RubyTerraform).to(receive(:configure))
+        allow(RakeDependencies::Tasks::All)
+            .to(receive(:new)
+                .and_yield(terraform_task)
+                .and_yield(provider_task_1))
+
+        expect(provider_task_1)
+            .to(receive(:path=).with(File.join(
+                'vendor', 'terraform-provider-something1')))
+
+        RakeTerraform.define_installation_tasks({
+            providers: [
+                {
+                    name: 'something1',
+                    version: '1.1.1',
+                    repository: 'example/repository1'
+                }
+            ]
+        })
+      end
+
       it 'uses a type of :tar_gz' do
         terraform_task = stubbed_rake_dependencies_all_task
         provider_task_1 = stubbed_rake_dependencies_all_task
