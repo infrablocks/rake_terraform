@@ -18,7 +18,7 @@ module RakeTerraform
 
     namespace = opts[:namespace] || :terraform
     version = opts[:version] || '0.10.3'
-    path = opts[:path] || File.join('vendor', 'terraform')
+    path = opts[:path] || File.join(Dir.pwd, 'vendor', 'terraform')
     providers = opts[:providers] || []
 
     RubyTerraform.configure do |c|

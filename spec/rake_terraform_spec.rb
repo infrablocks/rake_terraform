@@ -32,7 +32,7 @@ RSpec.describe RakeTerraform do
 
   context 'define_installation_tasks' do
     context 'when configuring RubyTerraform' do
-      it 'sets the binary using a path of vendor/terraform by default' do
+      it 'sets the binary using a path of `pwd`/vendor/terraform by default' do
         config = stubbed_ruby_terraform_config
 
         allow(RakeDependencies::Tasks::All).to(receive(:new))
@@ -40,7 +40,7 @@ RSpec.describe RakeTerraform do
 
         expect(config)
             .to(receive(:binary=)
-                .with('vendor/terraform/bin/terraform'))
+                .with("#{Dir.pwd}/vendor/terraform/bin/terraform"))
 
         RakeTerraform.define_installation_tasks
       end
@@ -125,14 +125,14 @@ RSpec.describe RakeTerraform do
             version: '0.10.4')
       end
 
-      it 'uses a path of vendor/terraform by default' do
+      it 'uses a path of `pwd`/vendor/terraform by default' do
         task = stubbed_rake_dependencies_all_task
 
         allow(RubyTerraform).to(receive(:configure))
         expect(RakeDependencies::Tasks::All)
             .to(receive(:new).and_yield(task))
 
-        expect(task).to(receive(:path=).with('vendor/terraform'))
+        expect(task).to(receive(:path=).with("#{Dir.pwd}/vendor/terraform"))
 
         RakeTerraform.define_installation_tasks
       end
