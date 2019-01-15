@@ -59,7 +59,7 @@ PLATFORMS
 
 DEPENDENCIES
   activesupport (~> 5.2)
-  bundler (~> 1.17)
+  bundler (~> 1.16)
   fakefs (~> 0.18)
   gem-release (~> 2.0)
   rake (~> 12.3)
@@ -67,4 +67,4 @@ DEPENDENCIES
   rspec (~> 3.8)
 
 BUNDLED WITH
-   1.17.1
+   1.17.2
