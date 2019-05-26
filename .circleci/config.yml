@@ -3,14 +3,14 @@ jobs:
   test:
     working_directory: ~/rake-terraform
     docker:
-    - image: ruby:2.3.7
+    - image: ruby:2.3.8
     steps:
     - checkout
     - run: ./scripts/ci/steps/test.sh
   prerelease:
     working_directory: ~/rake-terraform
     docker:
-    - image: ruby:2.3.7
+    - image: ruby:2.3.8
     steps:
     - checkout
     - run: ./scripts/ci/common/install-git-crypt.sh
@@ -21,7 +21,7 @@ jobs:
   release:
     working_directory: ~/rake-terraform
     docker:
-    - image: ruby:2.3.7
+    - image: ruby:2.3.8
     steps:
     - checkout
     - run: ./scripts/ci/common/install-git-crypt.sh
