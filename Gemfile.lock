@@ -4,7 +4,7 @@ PATH
     rake_terraform (0.31.0)
       colored2 (~> 3.1)
       rake_dependencies (~> 0.23)
-      ruby-terraform (~> 0.44)
+      ruby-terraform (~> 0.46)
 
 GEM
   remote: https://rubygems.org/
@@ -47,7 +47,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.9.0)
     rspec-support (3.9.0)
-    ruby-terraform (0.44.0)
+    ruby-terraform (0.46.0)
       lino (~> 1.1)
     rubyzip (2.0.0)
     thread_safe (0.3.6)

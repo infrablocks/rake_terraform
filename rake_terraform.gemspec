@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 2.4.7'
 
   spec.add_dependency 'rake_dependencies', '~> 0.23'
-  spec.add_dependency 'ruby-terraform', '~> 0.44'
+  spec.add_dependency 'ruby-terraform', '~> 0.46'
   spec.add_dependency 'colored2', '~> 3.1'
 
   spec.add_development_dependency 'bundler', '~> 2.0'
