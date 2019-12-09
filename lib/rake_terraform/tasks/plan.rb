@@ -38,24 +38,30 @@ module RakeTerraform
 
           puts "Planning #{configuration_name}".cyan
 
-          configuration_directory = File.join(work_directory, source_directory)
+          params = OpenStruct.new({
+            configuration_name: configuration_name,
+            source_directory: source_directory,
+            work_directory: work_directory,
+            backend_config: backend_config,
+            state_file: state_file,
+            debug: debug,
+            no_color: no_color,
+          })
+
+          derived_source_directory = source_directory.respond_to?(:call) ?
+             source_directory.call(
+                 *[args, params].slice(0, source_directory.arity)) :
+             source_directory
+
+          configuration_directory = File.join(work_directory, derived_source_directory)
 
           RubyTerraform.clean(
               directory: configuration_directory)
 
           mkdir_p File.dirname(configuration_directory)
-          cp_r source_directory, configuration_directory
+          cp_r derived_source_directory, configuration_directory
 
-          params = OpenStruct.new({
-              configuration_name: configuration_name,
-              source_directory: source_directory,
-              work_directory: work_directory,
-              configuration_directory: configuration_directory,
-              backend_config: backend_config,
-              state_file: state_file,
-              debug: debug,
-              no_color: no_color,
-          })
+          params.configuration_directory = configuration_directory
 
           derived_backend_config = backend_config.respond_to?(:call) ?
               backend_config.call(

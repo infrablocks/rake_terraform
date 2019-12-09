@@ -362,6 +362,36 @@ describe RakeTerraform::Tasks::Destroy do
     Rake::Task['destroy'].invoke
   end
 
+  it 'uses the provided source directory factory when supplied' do
+    bucket_name = 'bucket-from-args'
+    configuration_name = 'network'
+    source_directory = "#{bucket_name}/#{configuration_name}"
+    configuration_directory = "build/#{bucket_name}/#{configuration_name}"
+
+    subject.new do |t|
+      t.argument_names = [:bucket_name]
+
+      t.configuration_name = configuration_name
+      t.source_directory = lambda do |args, params|
+        "#{args.bucket_name}/#{params.configuration_name}"
+      end
+      t.work_directory = 'build'
+    end
+
+    stub_puts
+    stub_chdir
+    stub_cp_r
+    stub_mkdir_p
+    stub_ruby_terraform
+
+  expect_any_instance_of(FileUtils)
+      .to(receive(:cp_r))
+      .with(source_directory, configuration_directory, anything)
+
+    Rake::Task['destroy'].invoke(bucket_name)
+  end
+
+
   it 'uses the provided vars map in the terraform destroy call' do
     vars = {
         first_thing: '1',
