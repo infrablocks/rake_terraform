@@ -12,43 +12,45 @@ describe RakeTerraform::Tasks::Plan do
 
   it 'adds a plan task in the namespace in which it is created' do
     namespace :infrastructure do
-      subject.new do |t|
+      subject.define do |t|
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
       end
     end
 
-    expect(Rake::Task['infrastructure:plan']).not_to be_nil
+    expect(Rake::Task.task_defined?('infrastructure:plan'))
+        .to(be(true))
   end
 
   it 'gives the plan task a description' do
     namespace :dependency do
-      subject.new do |t|
-        t.configuration_name = 'network'
+      subject.define(configuration_name: 'network') do |t|
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
       end
     end
 
-    expect(rake.last_description).to(eq('Plan network using terraform'))
+    expect(Rake::Task["dependency:plan"].full_comment)
+        .to(eq('Plan network using terraform'))
   end
 
   it 'allows the task name to be overridden' do
     namespace :infrastructure do
-      subject.new(:plan_network) do |t|
+      subject.define(name: :plan_network) do |t|
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
       end
     end
 
-    expect(Rake::Task['infrastructure:plan_network']).not_to be_nil
+    expect(Rake::Task.task_defined?('infrastructure:plan_network'))
+        .to(be(true))
   end
 
   it 'allows multiple plan tasks to be declared' do
     namespace :infra1 do
-      subject.new do |t|
+      subject.define do |t|
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
@@ -56,7 +58,7 @@ describe RakeTerraform::Tasks::Plan do
     end
 
     namespace :infra2 do
-      subject.new do |t|
+      subject.define do |t|
         t.configuration_name = 'database'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
@@ -72,7 +74,7 @@ describe RakeTerraform::Tasks::Plan do
 
   it 'depends on the terraform:ensure task by default' do
     namespace :infrastructure do
-      subject.new do |t|
+      subject.define do |t|
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
@@ -91,12 +93,10 @@ describe RakeTerraform::Tasks::Plan do
     end
 
     namespace :infrastructure do
-      subject.new do |t|
+      subject.define(ensure_task_name: 'tools:terraform:ensure') do |t|
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
-
-        t.ensure_task = 'tools:terraform:ensure'
       end
     end
 
@@ -108,9 +108,7 @@ describe RakeTerraform::Tasks::Plan do
     argument_names = [:deployment_identifier, :region]
 
     namespace :infrastructure do
-      subject.new do |t|
-        t.argument_names = argument_names
-
+      subject.define(argument_names: argument_names) do |t|
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
@@ -126,7 +124,7 @@ describe RakeTerraform::Tasks::Plan do
     work_directory = 'build'
     configuration_directory = "#{work_directory}/#{source_directory}"
 
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = source_directory
       t.work_directory = work_directory
@@ -149,7 +147,7 @@ describe RakeTerraform::Tasks::Plan do
     work_directory = 'build'
     parent_of_configuration_directory = "#{work_directory}/infra"
 
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = source_directory
       t.work_directory = work_directory
@@ -173,7 +171,7 @@ describe RakeTerraform::Tasks::Plan do
     work_directory = 'build'
     configuration_directory = "#{work_directory}/#{source_directory}"
 
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = source_directory
       t.work_directory = work_directory
@@ -197,7 +195,7 @@ describe RakeTerraform::Tasks::Plan do
     work_directory = 'build'
     configuration_directory = "#{work_directory}/#{source_directory}"
 
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = source_directory
       t.work_directory = work_directory
@@ -219,7 +217,7 @@ describe RakeTerraform::Tasks::Plan do
     work_directory = 'build'
     configuration_directory = "#{work_directory}/#{source_directory}"
 
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = source_directory
       t.work_directory = work_directory
@@ -237,7 +235,7 @@ describe RakeTerraform::Tasks::Plan do
   end
 
   it 'passes a no_color parameter of false to init by default' do
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
@@ -251,13 +249,13 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
         .to(receive(:init)
-                .with(hash_including(no_color: false)))
+            .with(hash_including(no_color: false)))
 
     Rake::Task['plan'].invoke
   end
 
   it 'passes the provided value for the no_color parameter to init when present' do
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
@@ -273,7 +271,7 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
         .to(receive(:init)
-                .with(hash_including(no_color: true)))
+            .with(hash_including(no_color: true)))
 
     Rake::Task['plan'].invoke
   end
@@ -284,7 +282,7 @@ describe RakeTerraform::Tasks::Plan do
         key: 'some-key.tfstate',
         region: 'eu-west-2'
     }
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
@@ -300,27 +298,23 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
         .to(receive(:init)
-                .with(hash_including(
-                          backend_config: backend_config)))
+            .with(hash_including(
+                backend_config: backend_config)))
 
     Rake::Task['plan'].invoke
   end
 
   it 'uses the provided backend config factory when supplied' do
-    subject.new do |t|
-      t.argument_names = [:bucket_name]
-
+    subject.define(argument_names: [:bucket_name]) do |t, args|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
 
-      t.backend_config = lambda do |args, params|
-        {
-            bucket: args.bucket_name,
-            key: "#{params.configuration_name}.tfstate",
-            region: 'eu-west-2'
-        }
-      end
+      t.backend_config = {
+          bucket: args.bucket_name,
+          key: "#{t.configuration_name}.tfstate",
+          region: 'eu-west-2'
+      }
     end
 
     stub_puts
@@ -331,12 +325,12 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
         .to(receive(:init)
-                .with(hash_including(
-                          backend_config: {
-                              bucket: 'bucket-from-args',
-                              key: 'network.tfstate',
-                              region: 'eu-west-2'
-                          })))
+            .with(hash_including(
+                backend_config: {
+                    bucket: 'bucket-from-args',
+                    key: 'network.tfstate',
+                    region: 'eu-west-2'
+                })))
 
     Rake::Task['plan'].invoke('bucket-from-args')
   end
@@ -344,9 +338,8 @@ describe RakeTerraform::Tasks::Plan do
   it 'plans with terraform for the provided configuration directory' do
     source_directory = 'infra/network'
     work_directory = 'build'
-    configuration_directory = "#{work_directory}/#{source_directory}"
 
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = source_directory
       t.work_directory = work_directory
@@ -369,13 +362,9 @@ describe RakeTerraform::Tasks::Plan do
     source_directory = "#{bucket_name}/#{configuration_name}"
     configuration_directory = "build/#{bucket_name}/#{configuration_name}"
 
-    subject.new do |t|
-      t.argument_names = [:bucket_name]
-
+    subject.define(argument_names: [:bucket_name]) do |t, args|
       t.configuration_name = configuration_name
-      t.source_directory = lambda do |args, params|
-        "#{args.bucket_name}/#{params.configuration_name}"
-      end
+      t.source_directory = "#{args.bucket_name}/#{t.configuration_name}"
       t.work_directory = 'build'
     end
 
@@ -398,7 +387,7 @@ describe RakeTerraform::Tasks::Plan do
         second_thing: '2'
     }
 
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
@@ -414,15 +403,13 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
         .to(receive(:plan)
-                .with(hash_including(vars: vars)))
+            .with(hash_including(vars: vars)))
 
     Rake::Task['plan'].invoke
   end
 
   it 'uses the provided vars factory in the terraform plan call' do
-    subject.new do |t|
-      t.argument_names = [:deployment_identifier]
-
+    subject.define(argument_names: [:deployment_identifier]) do |t, args|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
@@ -431,13 +418,11 @@ describe RakeTerraform::Tasks::Plan do
           bucket: 'some-bucket'
       }
 
-      t.vars = lambda do |args, params|
-        {
-            deployment_identifier: args.deployment_identifier,
-            configuration_name: params.configuration_name,
-            state_bucket: params.backend_config[:bucket]
-        }
-      end
+      t.vars = {
+          deployment_identifier: args.deployment_identifier,
+          configuration_name: t.configuration_name,
+          state_bucket: t.backend_config[:bucket]
+      }
     end
 
     stub_puts
@@ -448,11 +433,11 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
         .to(receive(:plan)
-                .with(hash_including(vars: {
-                    deployment_identifier: 'staging',
-                    configuration_name: 'network',
-                    state_bucket: 'some-bucket'
-                })))
+            .with(hash_including(vars: {
+                deployment_identifier: 'staging',
+                configuration_name: 'network',
+                state_bucket: 'some-bucket'
+            })))
 
     Rake::Task['plan'].invoke('staging')
   end
@@ -460,7 +445,7 @@ describe RakeTerraform::Tasks::Plan do
   it 'uses the provided var file when present' do
     var_file = 'some/terraform.tfvars'
 
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
@@ -476,7 +461,7 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
         .to(receive(:plan)
-                .with(hash_including(var_file: var_file)))
+            .with(hash_including(var_file: var_file)))
 
     Rake::Task['plan'].invoke
   end
@@ -484,7 +469,7 @@ describe RakeTerraform::Tasks::Plan do
   it 'uses the provided state file when present' do
     state_file = 'some/state.tfstate'
 
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
@@ -500,22 +485,20 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
         .to(receive(:plan)
-                .with(hash_including(state: state_file)))
+            .with(hash_including(state: state_file)))
 
     Rake::Task['plan'].invoke
   end
 
   it 'uses the provided state file factory when present' do
-    subject.new do |t|
-      t.argument_names = [:deployment_identifier]
-
+    subject.define(argument_names: [:deployment_identifier]) do |t, args|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
 
-      t.state_file = lambda do |args, params|
-        "path/to/state/#{args.deployment_identifier}/#{params.configuration_name}.tfstate"
-      end
+      t.state_file =
+          "path/to/state/#{args.deployment_identifier}/" +
+              "#{t.configuration_name}.tfstate"
     end
 
     stub_puts
@@ -526,7 +509,7 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
         .to(receive(:plan)
-                .with(hash_including(state: "path/to/state/staging/network.tfstate")))
+            .with(hash_including(state: "path/to/state/staging/network.tfstate")))
 
     Rake::Task['plan'].invoke('staging')
   end
@@ -534,7 +517,7 @@ describe RakeTerraform::Tasks::Plan do
   it 'uses the provided plan file when present' do
     plan_file = 'some/plan.tfplan'
 
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
@@ -550,13 +533,13 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
         .to(receive(:plan)
-                .with(hash_including(plan: plan_file)))
+            .with(hash_including(plan: plan_file)))
 
     Rake::Task['plan'].invoke
   end
 
   it 'passes a no_color parameter of false to plan by default' do
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
@@ -570,13 +553,13 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
         .to(receive(:plan)
-                .with(hash_including(no_color: false)))
+            .with(hash_including(no_color: false)))
 
     Rake::Task['plan'].invoke
   end
 
   it 'passes the provided value for the no_color parameter to plan when present' do
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
@@ -591,13 +574,13 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
         .to(receive(:plan)
-                .with(hash_including(no_color: true)))
+            .with(hash_including(no_color: true)))
 
     Rake::Task['plan'].invoke
   end
 
   it 'passes a destroy parameter of false to plan by default' do
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
@@ -611,13 +594,13 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
         .to(receive(:plan)
-                .with(hash_including(destroy: false)))
+            .with(hash_including(destroy: false)))
 
     Rake::Task['plan'].invoke
   end
 
   it 'passes the provided value for the destroy parameter to plan when present' do
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
@@ -632,7 +615,7 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
         .to(receive(:plan)
-                .with(hash_including(destroy: true)))
+            .with(hash_including(destroy: true)))
 
     Rake::Task['plan'].invoke
   end

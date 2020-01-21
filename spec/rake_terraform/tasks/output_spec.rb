@@ -12,7 +12,7 @@ describe RakeTerraform::Tasks::Output do
 
   it 'adds an output task in the namespace in which it is created' do
     namespace :infrastructure do
-      subject.new do |t|
+      subject.define do |t|
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
@@ -24,31 +24,32 @@ describe RakeTerraform::Tasks::Output do
 
   it 'gives the output task a description' do
     namespace :dependency do
-      subject.new do |t|
-        t.configuration_name = 'network'
+      subject.define(configuration_name: 'network') do |t|
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
       end
     end
 
-    expect(rake.last_description).to(eq('Output network using terraform'))
+    expect(Rake::Task["dependency:output"].full_comment)
+        .to(eq('Output network using terraform'))
   end
 
   it 'allows the task name to be overridden' do
     namespace :infrastructure do
-      subject.new(:output_network) do |t|
+      subject.define(name: :output_network) do |t|
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
       end
     end
 
-    expect(Rake::Task['infrastructure:output_network']).not_to be_nil
+    expect(Rake::Task.task_defined?('infrastructure:output_network'))
+        .to(be(true))
   end
 
   it 'allows multiple output tasks to be declared' do
     namespace :infra1 do
-      subject.new do |t|
+      subject.define do |t|
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
@@ -56,7 +57,7 @@ describe RakeTerraform::Tasks::Output do
     end
 
     namespace :infra2 do
-      subject.new do |t|
+      subject.define do |t|
         t.configuration_name = 'database'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
@@ -72,7 +73,7 @@ describe RakeTerraform::Tasks::Output do
 
   it 'depends on the terraform:ensure task by default' do
     namespace :infrastructure do
-      subject.new do |t|
+      subject.define do |t|
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
@@ -91,12 +92,10 @@ describe RakeTerraform::Tasks::Output do
     end
 
     namespace :infrastructure do
-      subject.new do |t|
+      subject.define(ensure_task_name: 'tools:terraform:ensure') do |t|
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
-
-        t.ensure_task = 'tools:terraform:ensure'
       end
     end
 
@@ -108,9 +107,7 @@ describe RakeTerraform::Tasks::Output do
     argument_names = [:deployment_identifier, :region]
 
     namespace :infrastructure do
-      subject.new do |t|
-        t.argument_names = argument_names
-
+      subject.define(argument_names: argument_names) do |t|
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
@@ -126,7 +123,7 @@ describe RakeTerraform::Tasks::Output do
     work_directory = 'build'
     configuration_directory = "#{work_directory}/#{source_directory}"
 
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = source_directory
       t.work_directory = work_directory
@@ -149,7 +146,7 @@ describe RakeTerraform::Tasks::Output do
     work_directory = 'build'
     parent_of_configuration_directory = "#{work_directory}/infra"
 
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = source_directory
       t.work_directory = work_directory
@@ -173,7 +170,7 @@ describe RakeTerraform::Tasks::Output do
     work_directory = 'build'
     configuration_directory = "#{work_directory}/#{source_directory}"
 
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = source_directory
       t.work_directory = work_directory
@@ -197,7 +194,7 @@ describe RakeTerraform::Tasks::Output do
     work_directory = 'build'
     configuration_directory = "#{work_directory}/#{source_directory}"
 
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = source_directory
       t.work_directory = work_directory
@@ -218,7 +215,7 @@ describe RakeTerraform::Tasks::Output do
     source_directory = 'infra/network'
     work_directory = 'build'
 
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = source_directory
       t.work_directory = work_directory
@@ -241,13 +238,9 @@ describe RakeTerraform::Tasks::Output do
     source_directory = "#{bucket_name}/#{configuration_name}"
     configuration_directory = "build/#{bucket_name}/#{configuration_name}"
 
-    subject.new do |t|
-      t.argument_names = [:bucket_name]
-
+    subject.define(argument_names: [:bucket_name]) do |t, args|
       t.configuration_name = configuration_name
-      t.source_directory = lambda do |args, params|
-        "#{args.bucket_name}/#{params.configuration_name}"
-      end
+      t.source_directory = "#{args.bucket_name}/#{t.configuration_name}"
       t.work_directory = 'build'
     end
 
@@ -267,7 +260,7 @@ describe RakeTerraform::Tasks::Output do
   it 'uses the provided state file when present' do
     state_file = 'some/state.tfstate'
 
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
@@ -289,16 +282,14 @@ describe RakeTerraform::Tasks::Output do
   end
 
   it 'uses the provided state file factory when present' do
-    subject.new do |t|
-      t.argument_names = [:deployment_identifier]
-
+    subject.define(argument_names: [:deployment_identifier]) do |t, args|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
 
-      t.state_file = lambda do |args, params|
-        "path/to/state/#{args.deployment_identifier}/#{params.configuration_name}.tfstate"
-      end
+      t.state_file =
+        "path/to/state/#{args.deployment_identifier}/" +
+            "#{t.configuration_name}.tfstate"
     end
 
     stub_puts
@@ -315,7 +306,7 @@ describe RakeTerraform::Tasks::Output do
   end
 
   it 'passes a no_color parameter of false to output by default' do
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
@@ -335,7 +326,7 @@ describe RakeTerraform::Tasks::Output do
   end
 
   it 'passes the provided value for the no_color parameter to output when present' do
-    subject.new do |t|
+    subject.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
