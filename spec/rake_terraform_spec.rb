@@ -14,18 +14,21 @@ RSpec.describe RakeTerraform do
 
   context 'define_command_tasks' do
     context 'when instantiating RakeTerraform::TaskSets::All' do
-      it 'passes the provided block' do
+      it 'passes the provided options and block' do
+        opts = {work_directory: "./"}
+
         block = lambda do |t|
           t.configuration_name = 'network'
           t.configuration_directory = 'infra/network'
         end
 
         expect(RakeTerraform::TaskSets::All)
-            .to(receive(:define) do |*_, &passed_block|
+            .to(receive(:define) do |passed_opts, &passed_block|
+              expect(passed_opts).to(eq(opts))
               expect(passed_block).to(eq(block))
             end)
 
-        RakeTerraform.define_command_tasks(&block)
+        RakeTerraform.define_command_tasks(opts, &block)
       end
     end
   end

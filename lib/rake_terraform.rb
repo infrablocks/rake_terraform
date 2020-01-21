@@ -8,8 +8,8 @@ require 'rake_terraform/task_sets'
 module RakeTerraform
   include RubyTerraform
 
-  def self.define_command_tasks(&block)
-    RakeTerraform::TaskSets::All.define(&block)
+  def self.define_command_tasks(opts = {}, &block)
+    RakeTerraform::TaskSets::All.define(opts, &block)
   end
 
   def self.define_installation_tasks(opts = {})
