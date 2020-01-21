@@ -1,13 +1,16 @@
+require 'rake_factory'
 require 'ruby_terraform'
 require 'ostruct'
 require 'colored2'
-require_relative '../tasklib'
 
 module RakeTerraform
   module Tasks
-    class Output < TaskLib
-      parameter :name, :default => :output
-      parameter :argument_names, :default => []
+    class Output < RakeFactory::Task
+      default_name :output
+      default_prerequisites ->(t) { [t.ensure_task_name] }
+      default_description ->(t) {
+        "Output #{t.configuration_name} using terraform"
+      }
 
       parameter :configuration_name, :required => true
       parameter :source_directory, :required => true
@@ -21,67 +24,33 @@ module RakeTerraform
       parameter :no_color, :default => false
       parameter :no_print_output, :default => false
 
-      parameter :ensure_task, :default => :'terraform:ensure'
+      parameter :ensure_task_name, :default => :'terraform:ensure'
 
-      def process_arguments(args)
-        self.name = args[0] if args[0]
-      end
+      action do |t|
+        Colored2.disable! if t.no_color
 
-      def define
-        desc "Output #{configuration_name} using terraform"
-        task name, argument_names => [ensure_task] do |_, args|
-          Colored2.disable! if no_color
+        configuration_directory =
+            File.join(t.work_directory, t.source_directory)
 
-          puts "Output of #{configuration_name}".cyan
+        puts "Output of #{t.configuration_name}".cyan
+        RubyTerraform.clean(
+            directory: configuration_directory)
 
-          params = OpenStruct.new({
-            configuration_name: configuration_name,
-            source_directory: source_directory,
-            work_directory: work_directory,
-            backend_config: backend_config,
-            state_file: state_file,
-            debug: debug,
-            no_color: no_color,
-            no_print_output: no_print_output,
-          })
+        mkdir_p File.dirname(configuration_directory)
+        cp_r t.source_directory, configuration_directory
 
-          derived_source_directory = source_directory.respond_to?(:call) ?
-             source_directory.call(
-                 *[args, params].slice(0, source_directory.arity)) :
-             source_directory
+        Dir.chdir(configuration_directory) do
+          RubyTerraform.init(
+              backend_config: t.backend_config,
+              no_color: t.no_color)
 
-          configuration_directory = File.join(work_directory, derived_source_directory)
+          output = RubyTerraform.output(
+              no_color: t.no_color,
+              state: t.state_file)
 
-          RubyTerraform.clean(
-              directory: configuration_directory)
+          puts output unless t.no_print_output
 
-          mkdir_p File.dirname(configuration_directory)
-          cp_r derived_source_directory, configuration_directory
-
-          params.configuration_directory = configuration_directory
-
-          derived_backend_config = backend_config.respond_to?(:call) ?
-              backend_config.call(
-                  *[args, params].slice(0, backend_config.arity)) :
-              backend_config
-          derived_state_file = state_file.respond_to?(:call) ?
-              state_file.call(
-                  *[args, params].slice(0, state_file.arity)) :
-              state_file
-
-          Dir.chdir(configuration_directory) do
-            RubyTerraform.init(
-                backend_config: derived_backend_config,
-                no_color: no_color)
-
-            output = RubyTerraform.output(
-                no_color: no_color,
-                state: derived_state_file)
-
-            puts output unless no_print_output
-
-            output
-          end
+          output
         end
       end
     end

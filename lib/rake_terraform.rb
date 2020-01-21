@@ -2,14 +2,14 @@ require 'logger'
 require 'rake_dependencies'
 require 'ruby_terraform'
 require 'rake_terraform/version'
-require 'rake_terraform/tasklib'
 require 'rake_terraform/tasks'
+require 'rake_terraform/task_sets'
 
 module RakeTerraform
   include RubyTerraform
 
   def self.define_command_tasks(&block)
-    RakeTerraform::Tasks::All.new(&block)
+    RakeTerraform::TaskSets::All.define(&block)
   end
 
   def self.define_installation_tasks(opts = {})
