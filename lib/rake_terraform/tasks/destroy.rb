@@ -7,10 +7,13 @@ module RakeTerraform
   module Tasks
     class Destroy < RakeFactory::Task
       default_name :destroy
-      default_prerequisites ->(t) { [t.ensure_task_name] }
-      default_description ->(t) {
+      default_prerequisites RakeFactory::DynamicValue.new { |t|
+        [t.ensure_task_name]
+      }
+      default_description RakeFactory::DynamicValue.new { |t|
         "Destroy #{t.configuration_name} using terraform"
       }
+
       parameter :configuration_name, :required => true
       parameter :source_directory, :required => true
       parameter :work_directory, :required => true

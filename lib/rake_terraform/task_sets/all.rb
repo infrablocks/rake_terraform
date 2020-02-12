@@ -11,7 +11,7 @@ module RakeTerraform
 
       parameter :backend_config
 
-      parameter :vars
+      parameter :vars, default: {}
       parameter :var_file
       parameter :state_file
 
@@ -44,31 +44,41 @@ module RakeTerraform
       parameter :output_argument_names
 
       task Tasks::Validate,
-          name: ->(ts) { ts.validate_task_name },
-          argument_names: ->(ts) {
+          name: RakeFactory::DynamicValue.new { |ts|
+            ts.validate_task_name
+          },
+          argument_names: RakeFactory::DynamicValue.new { |ts|
             ts.validate_argument_names || ts.argument_names || []
           }
       task Tasks::Plan, {
-          name: ->(ts) { ts.plan_task_name },
-          argument_names: ->(ts) {
+          name: RakeFactory::DynamicValue.new { |ts|
+            ts.plan_task_name
+          },
+          argument_names: RakeFactory::DynamicValue.new { |ts|
             ts.plan_argument_names || ts.argument_names || []
           }
       }
       task Tasks::Provision, {
-          name: ->(ts) { ts.provision_task_name },
-          argument_names: ->(ts) {
+          name: RakeFactory::DynamicValue.new { |ts|
+            ts.provision_task_name
+          },
+          argument_names: RakeFactory::DynamicValue.new { |ts|
             ts.provision_argument_names || ts.argument_names || []
           }
       }
       task Tasks::Destroy, {
-          name: ->(ts) { ts.destroy_task_name },
-          argument_names: ->(ts) {
+          name: RakeFactory::DynamicValue.new { |ts|
+            ts.destroy_task_name
+          },
+          argument_names: RakeFactory::DynamicValue.new { |ts|
             ts.destroy_argument_names || ts.argument_names || []
           }
       }
       task Tasks::Output, {
-          name: ->(ts) { ts.output_task_name },
-          argument_names: ->(ts) {
+          name: RakeFactory::DynamicValue.new { |ts|
+            ts.output_task_name
+          },
+          argument_names: RakeFactory::DynamicValue.new { |ts|
             ts.output_argument_names || ts.argument_names || []
           }
       }

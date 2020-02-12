@@ -7,8 +7,10 @@ module RakeTerraform
   module Tasks
     class Plan < RakeFactory::Task
       default_name :plan
-      default_prerequisites ->(t) { [t.ensure_task_name] }
-      default_description ->(t) {
+      default_prerequisites RakeFactory::DynamicValue.new { |t|
+        [t.ensure_task_name]
+      }
+      default_description RakeFactory::DynamicValue.new { |t|
         "Plan #{t.configuration_name} using terraform"
       }
 

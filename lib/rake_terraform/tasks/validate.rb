@@ -7,8 +7,10 @@ module RakeTerraform
   module Tasks
     class Validate < RakeFactory::Task
       default_name :validate
-      default_prerequisites ->(t) { [t.ensure_task_name] }
-      default_description ->(t) {
+      default_prerequisites RakeFactory::DynamicValue.new { |t|
+        [t.ensure_task_name]
+      }
+      default_description RakeFactory::DynamicValue.new { |t|
         "Validate #{t.configuration_name} using terraform"
       }
 

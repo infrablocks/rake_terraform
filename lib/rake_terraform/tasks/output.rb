@@ -7,8 +7,10 @@ module RakeTerraform
   module Tasks
     class Output < RakeFactory::Task
       default_name :output
-      default_prerequisites ->(t) { [t.ensure_task_name] }
-      default_description ->(t) {
+      default_prerequisites RakeFactory::DynamicValue.new { |t|
+        [t.ensure_task_name]
+      }
+      default_description RakeFactory::DynamicValue.new { |t|
         "Output #{t.configuration_name} using terraform"
       }
 
