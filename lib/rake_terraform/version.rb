@@ -1,3 +1,3 @@
 module RakeTerraform
-  VERSION = "1.4.0.pre.1"
+  VERSION = "1.5.0"
 end
