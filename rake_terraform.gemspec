@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'rake_dependencies', '~> 2', '< 3'
   spec.add_dependency 'rake_factory', '>= 0.23', '< 1'
-  spec.add_dependency 'ruby-terraform', '~> 0.48'
+  spec.add_dependency 'ruby-terraform', '>= 0.48', '< 1'
   spec.add_dependency 'colored2', '~> 3.1'
 
   spec.add_development_dependency 'bundler', '~> 2.0'
