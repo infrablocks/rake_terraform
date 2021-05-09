@@ -27,6 +27,7 @@ module RakeTerraform
       parameter :state_file
 
       parameter :debug, default: false
+      parameter :input, default: false
       parameter :no_color, default: false
       parameter :no_backup, default: false
 
@@ -34,36 +35,42 @@ module RakeTerraform
 
       parameter :ensure_task_name, default: :'terraform:ensure'
 
+      # rubocop:disable Metrics/BlockLength
+
       action do |t|
         Colored2.disable! if t.no_color
 
+        module_directory =
+          File.join(FileUtils.pwd, t.source_directory)
         configuration_directory =
           File.join(t.work_directory, t.source_directory)
 
         Kernel.puts "Destroying #{t.configuration_name}".cyan
-        RubyTerraform.clean(
-          directory: configuration_directory
+
+        FileUtils.rm_rf(configuration_directory)
+        FileUtils.mkdir_p(configuration_directory)
+
+        RubyTerraform.init(
+          chdir: configuration_directory,
+          from_module: module_directory,
+          backend_config: t.backend_config,
+          no_color: t.no_color,
+          input: t.input
         )
-
-        FileUtils.mkdir_p(File.dirname(configuration_directory))
-        FileUtils.cp_r(t.source_directory, configuration_directory)
-
-        Dir.chdir(configuration_directory) do
-          RubyTerraform.init(
-            backend_config: t.backend_config,
-            no_color: t.no_color
-          )
-          RubyTerraform.destroy(
-            force: true,
-            no_color: t.no_color,
-            no_backup: t.no_backup,
-            backup: t.backup_file,
-            state: t.state_file,
-            vars: t.vars,
-            var_file: t.var_file
-          )
-        end
+        RubyTerraform.destroy(
+          chdir: configuration_directory,
+          force: true,
+          input: t.input,
+          no_color: t.no_color,
+          no_backup: t.no_backup,
+          backup: t.backup_file,
+          state: t.state_file,
+          vars: t.vars,
+          var_file: t.var_file
+        )
       end
+
+      # rubocop:enable Metrics/BlockLength
     end
   end
 end

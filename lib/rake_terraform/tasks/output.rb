@@ -25,6 +25,7 @@ module RakeTerraform
       parameter :state_file
 
       parameter :debug, default: false
+      parameter :input, default: false
       parameter :no_color, default: false
       parameter :no_print_output, default: false
 
@@ -33,32 +34,32 @@ module RakeTerraform
       action do |t|
         Colored2.disable! if t.no_color
 
+        module_directory =
+          File.join(FileUtils.pwd, t.source_directory)
         configuration_directory =
           File.join(t.work_directory, t.source_directory)
 
         Kernel.puts("Output of #{t.configuration_name}".cyan)
-        RubyTerraform.clean(
-          directory: configuration_directory
+
+        FileUtils.rm_rf(configuration_directory)
+        FileUtils.mkdir_p(configuration_directory)
+
+        RubyTerraform.init(
+          chdir: configuration_directory,
+          from_module: module_directory,
+          backend_config: t.backend_config,
+          no_color: t.no_color,
+          input: t.input
+        )
+        output = RubyTerraform.output(
+          chdir: configuration_directory,
+          no_color: t.no_color,
+          state: t.state_file
         )
 
-        FileUtils.mkdir_p(File.dirname(configuration_directory))
-        FileUtils.cp_r(t.source_directory, configuration_directory)
+        Kernel.puts(output) unless t.no_print_output
 
-        Dir.chdir(configuration_directory) do
-          RubyTerraform.init(
-            backend_config: t.backend_config,
-            no_color: t.no_color
-          )
-
-          output = RubyTerraform.output(
-            no_color: t.no_color,
-            state: t.state_file
-          )
-
-          Kernel.puts(output) unless t.no_print_output
-
-          output
-        end
+        output
       end
     end
   end

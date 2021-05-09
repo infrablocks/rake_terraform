@@ -125,7 +125,7 @@ describe RakeTerraform::Tasks::Destroy do
       .to(eq(argument_names))
   end
 
-  it 'cleans the work directory' do
+  it 'cleans the configuration directory' do
     source_directory = 'infra/network'
     work_directory = 'build'
     configuration_directory = "#{work_directory}/#{source_directory}"
@@ -142,23 +142,21 @@ describe RakeTerraform::Tasks::Destroy do
 
     Rake::Task['destroy'].invoke
 
-    expect(RubyTerraform)
-      .to(have_received(:clean)
-            .with(directory: configuration_directory))
+    expect(FileUtils)
+      .to(have_received(:rm_rf)
+            .with(configuration_directory))
   end
 
-  it 'recursively makes the parent of the configuration directory' do
+  it 'recursively makes the configuration directory' do
     source_directory = 'infra/network'
     work_directory = 'build'
-    parent_of_configuration_directory = "#{work_directory}/infra"
+    configuration_directory = "#{work_directory}/infra/network"
 
     described_class.define do |t|
       t.configuration_name = 'network'
       t.source_directory = source_directory
       t.work_directory = work_directory
     end
-
-    allow(FileUtils).to(receive(:mkdir_p))
 
     stub_puts
     stub_fs
@@ -168,54 +166,10 @@ describe RakeTerraform::Tasks::Destroy do
 
     expect(FileUtils)
       .to(have_received(:mkdir_p)
-            .with(parent_of_configuration_directory))
-  end
-
-  it 'recursively copies the source directory to the work directory' do
-    source_directory = 'infra/network'
-    work_directory = 'build'
-    configuration_directory = "#{work_directory}/#{source_directory}"
-
-    described_class.define do |t|
-      t.configuration_name = 'network'
-      t.source_directory = source_directory
-      t.work_directory = work_directory
-    end
-
-    stub_puts
-    stub_fs
-    stub_ruby_terraform
-
-    Rake::Task['destroy'].invoke
-
-    expect(FileUtils)
-      .to(have_received(:cp_r)
-            .with(source_directory, configuration_directory))
-  end
-
-  it 'switches to the work directory' do
-    source_directory = 'infra/network'
-    work_directory = 'build'
-    configuration_directory = "#{work_directory}/#{source_directory}"
-
-    described_class.define do |t|
-      t.configuration_name = 'network'
-      t.source_directory = source_directory
-      t.work_directory = work_directory
-    end
-
-    stub_puts
-    stub_fs
-    stub_ruby_terraform
-
-    Rake::Task['destroy'].invoke
-
-    expect(Dir)
-      .to(have_received(:chdir)
             .with(configuration_directory))
   end
 
-  it 'initialises the work directory' do
+  it 'initialises the configuration directory' do
     source_directory = 'infra/network'
     work_directory = 'build'
 
@@ -274,18 +228,15 @@ describe RakeTerraform::Tasks::Destroy do
             .with(hash_including(no_color: true)))
   end
 
-  it 'passes the provided backend config to init when present' do
-    backend_config = {
-      bucket: 'some-bucket',
-      key: 'some-key.tfstate',
-      region: 'eu-west-2'
-    }
+  it 'passes the configuration directory as chdir parameter to init' do
+    source_directory = 'infra/network'
+    work_directory = 'build'
+    configuration_directory = "#{work_directory}/#{source_directory}"
+
     described_class.define do |t|
       t.configuration_name = 'network'
-      t.source_directory = 'infra/network'
-      t.work_directory = 'build'
-
-      t.backend_config = backend_config
+      t.source_directory = source_directory
+      t.work_directory = work_directory
     end
 
     stub_puts
@@ -296,11 +247,79 @@ describe RakeTerraform::Tasks::Destroy do
 
     expect(RubyTerraform)
       .to(have_received(:init)
-            .with(hash_including(backend_config: backend_config)))
+            .with(hash_including(chdir: configuration_directory)))
   end
 
-  it 'uses the provided backend config factory when supplied' do
-    described_class.define(argument_names: [:bucket_name]) do |t, args|
+  it 'passes the absolute source directory as from module parameter to init' do
+    source_directory = 'infra/network'
+    work_directory = 'build'
+    current_directory = '/path/to/project'
+    absolute_source_directory = "#{current_directory}/#{source_directory}"
+
+    described_class.define do |t|
+      t.configuration_name = 'network'
+      t.source_directory = source_directory
+      t.work_directory = work_directory
+    end
+
+    stub_puts
+    stub_fs
+    stub_ruby_terraform
+
+    allow(FileUtils)
+      .to(receive(:pwd))
+      .and_return(current_directory)
+
+    Rake::Task['destroy'].invoke
+
+    expect(RubyTerraform)
+      .to(have_received(:init)
+            .with(hash_including(from_module: absolute_source_directory)))
+  end
+
+  it 'passes an input parameter of false to init by default' do
+    described_class.define do |t|
+      t.configuration_name = 'network'
+      t.source_directory = 'infra/network'
+      t.work_directory = 'build'
+    end
+
+    stub_puts
+    stub_fs
+    stub_ruby_terraform
+
+    Rake::Task['destroy'].invoke
+
+    expect(RubyTerraform)
+      .to(have_received(:init)
+            .with(hash_including(input: false)))
+  end
+
+  it 'passes the provided value for the input parameter to init ' \
+     'when present' do
+    described_class.define do |t|
+      t.configuration_name = 'network'
+      t.source_directory = 'infra/network'
+      t.work_directory = 'build'
+
+      t.input = true
+    end
+
+    stub_puts
+    stub_fs
+    stub_ruby_terraform
+
+    Rake::Task['destroy'].invoke
+
+    expect(RubyTerraform)
+      .to(have_received(:init)
+            .with(hash_including(input: true)))
+  end
+
+  it 'passes the provided backend config to init when present' do
+    described_class.define(
+      argument_names: [:bucket_name]
+    ) do |t, args|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
@@ -329,7 +348,7 @@ describe RakeTerraform::Tasks::Destroy do
                   )))
   end
 
-  it 'destroys with terraform for the provided configuration' do
+  it 'destroys the configuration' do
     source_directory = 'infra/network'
     work_directory = 'build'
 
@@ -349,41 +368,15 @@ describe RakeTerraform::Tasks::Destroy do
       .to(have_received(:destroy))
   end
 
-  it 'uses the provided source directory factory when supplied' do
-    bucket_name = 'bucket-from-args'
-    configuration_name = 'network'
-    source_directory = "#{bucket_name}/#{configuration_name}"
-    configuration_directory = "build/#{bucket_name}/#{configuration_name}"
-
-    described_class.define(argument_names: [:bucket_name]) do |t, args|
-      t.configuration_name = configuration_name
-      t.source_directory = "#{args.bucket_name}/#{t.configuration_name}"
-      t.work_directory = 'build'
-    end
-
-    stub_puts
-    stub_fs
-    stub_ruby_terraform
-
-    Rake::Task['destroy'].invoke(bucket_name)
-
-    expect(FileUtils)
-      .to(have_received(:cp_r)
-            .with(source_directory, configuration_directory))
-  end
-
-  it 'uses the provided vars map in the terraform destroy call' do
-    vars = {
-      first_thing: '1',
-      second_thing: '2'
-    }
+  it 'passes the configuration directory as chdir parameter to apply' do
+    source_directory = 'infra/network'
+    work_directory = 'build'
+    configuration_directory = "#{work_directory}/#{source_directory}"
 
     described_class.define do |t|
       t.configuration_name = 'network'
-      t.source_directory = 'infra/network'
-      t.work_directory = 'build'
-
-      t.vars = vars
+      t.source_directory = source_directory
+      t.work_directory = work_directory
     end
 
     stub_puts
@@ -394,10 +387,10 @@ describe RakeTerraform::Tasks::Destroy do
 
     expect(RubyTerraform)
       .to(have_received(:destroy)
-            .with(hash_including(vars: vars)))
+            .with(hash_including(chdir: configuration_directory)))
   end
 
-  it 'uses the provided vars factory in the terraform destroy call' do
+  it 'uses the provided vars map in the terraform destroy call' do
     described_class.define(
       argument_names: [:deployment_identifier]
     ) do |t, args|
@@ -424,11 +417,13 @@ describe RakeTerraform::Tasks::Destroy do
 
     expect(RubyTerraform)
       .to(have_received(:destroy)
-            .with(hash_including(vars: {
-                                   deployment_identifier: 'staging',
-                                   configuration_name: 'network',
-                                   state_bucket: 'some-bucket'
-                                 })))
+            .with(hash_including(
+                    vars: {
+                      deployment_identifier: 'staging',
+                      configuration_name: 'network',
+                      state_bucket: 'some-bucket'
+                    }
+                  )))
   end
 
   it 'uses the provided var file when present' do
@@ -454,28 +449,6 @@ describe RakeTerraform::Tasks::Destroy do
   end
 
   it 'uses the provided state file when present' do
-    state_file = 'some/state.tfstate'
-
-    described_class.define do |t|
-      t.configuration_name = 'network'
-      t.source_directory = 'infra/network'
-      t.work_directory = 'build'
-
-      t.state_file = state_file
-    end
-
-    stub_puts
-    stub_fs
-    stub_ruby_terraform
-
-    Rake::Task['destroy'].invoke
-
-    expect(RubyTerraform)
-      .to(have_received(:destroy)
-            .with(hash_including(state: state_file)))
-  end
-
-  it 'uses the provided state file factory when present' do
     described_class.define(
       argument_names: [:deployment_identifier]
     ) do |t, args|
@@ -499,6 +472,45 @@ describe RakeTerraform::Tasks::Destroy do
             .with(hash_including(
                     state: 'path/to/state/staging/network.tfstate'
                   )))
+  end
+
+  it 'passes an input parameter of false to destroy by default' do
+    described_class.define do |t|
+      t.configuration_name = 'network'
+      t.source_directory = 'infra/network'
+      t.work_directory = 'build'
+    end
+
+    stub_puts
+    stub_fs
+    stub_ruby_terraform
+
+    Rake::Task['destroy'].invoke
+
+    expect(RubyTerraform)
+      .to(have_received(:destroy)
+            .with(hash_including(input: false)))
+  end
+
+  it 'passes the provided value for the input parameter to destroy ' \
+     'when present' do
+    described_class.define do |t|
+      t.configuration_name = 'network'
+      t.source_directory = 'infra/network'
+      t.work_directory = 'build'
+
+      t.input = true
+    end
+
+    stub_puts
+    stub_fs
+    stub_ruby_terraform
+
+    Rake::Task['destroy'].invoke
+
+    expect(RubyTerraform)
+      .to(have_received(:destroy)
+            .with(hash_including(input: true)))
   end
 
   it 'passes a no_color parameter of false to destroy by default' do
@@ -643,13 +655,12 @@ describe RakeTerraform::Tasks::Destroy do
   end
 
   def stub_fs
-    allow(Dir).to(receive(:chdir)).and_yield
-    allow(FileUtils).to(receive(:cp_r))
+    allow(FileUtils).to(receive(:pwd)).and_return('/')
+    allow(FileUtils).to(receive(:rm_rf))
     allow(FileUtils).to(receive(:mkdir_p))
   end
 
   def stub_ruby_terraform
-    allow(RubyTerraform).to(receive(:clean))
     allow(RubyTerraform).to(receive(:init))
     allow(RubyTerraform).to(receive(:destroy))
   end

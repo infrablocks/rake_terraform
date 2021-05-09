@@ -22,11 +22,8 @@ module RakeTerraform
 
       parameter :backend_config
 
-      parameter :vars, default: {}
-      parameter :var_file
-      parameter :state_file
-
       parameter :debug, default: false
+      parameter :input, default: false
       parameter :no_color, default: false
 
       parameter :ensure_task_name, default: :'terraform:ensure'
@@ -34,29 +31,27 @@ module RakeTerraform
       action do |t|
         Colored2.disable! if t.no_color
 
+        module_directory =
+          File.join(FileUtils.pwd, t.source_directory)
         configuration_directory =
           File.join(t.work_directory, t.source_directory)
 
         Kernel.puts("Validating #{t.configuration_name}".cyan)
-        RubyTerraform.clean(
-          directory: configuration_directory
+
+        FileUtils.rm_rf(configuration_directory)
+        FileUtils.mkdir_p(configuration_directory)
+
+        RubyTerraform.init(
+          chdir: configuration_directory,
+          from_module: module_directory,
+          backend_config: t.backend_config,
+          no_color: t.no_color,
+          input: t.input
         )
-
-        FileUtils.mkdir_p(File.dirname(configuration_directory))
-        FileUtils.cp_r(t.source_directory, configuration_directory)
-
-        Dir.chdir(configuration_directory) do
-          RubyTerraform.init(
-            backend_config: t.backend_config,
-            no_color: t.no_color
-          )
-          RubyTerraform.validate(
-            no_color: t.no_color,
-            state: t.state_file,
-            vars: t.vars,
-            var_file: t.var_file
-          )
-        end
+        RubyTerraform.validate(
+          chdir: configuration_directory,
+          no_color: t.no_color
+        )
       end
     end
   end
