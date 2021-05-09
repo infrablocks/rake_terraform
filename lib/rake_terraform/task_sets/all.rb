@@ -19,6 +19,8 @@ module RakeTerraform
 
       parameter :debug, default: false
 
+      parameter :input, default: false
+
       parameter :no_color, default: false
       parameter :no_backup, default: false
       parameter :no_print_output, default: false

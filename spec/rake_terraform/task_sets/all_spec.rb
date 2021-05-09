@@ -93,6 +93,28 @@ describe RakeTerraform::TaskSets::All do
       expect(rake_task.creator.debug).to(eq(false))
     end
 
+    it 'passes supplied value for input when provided' do
+      input = true
+
+      namespace :network do
+        define_tasks(input: input)
+      end
+
+      rake_task = Rake::Task['network:validate']
+
+      expect(rake_task.creator.input).to(eq(input))
+    end
+
+    it 'uses default for input by default' do
+      namespace :network do
+        define_tasks
+      end
+
+      rake_task = Rake::Task['network:validate']
+
+      expect(rake_task.creator.input).to(eq(false))
+    end
+
     it 'passes supplied value for no_color when provided' do
       no_color = true
 
@@ -343,6 +365,28 @@ describe RakeTerraform::TaskSets::All do
       expect(rake_task.creator.debug).to(eq(false))
     end
 
+    it 'passes supplied value for input when provided' do
+      input = true
+
+      namespace :network do
+        define_tasks(input: input)
+      end
+
+      rake_task = Rake::Task['network:plan']
+
+      expect(rake_task.creator.input).to(eq(input))
+    end
+
+    it 'passes false for input by default' do
+      namespace :network do
+        define_tasks
+      end
+
+      rake_task = Rake::Task['network:plan']
+
+      expect(rake_task.creator.input).to(eq(false))
+    end
+
     it 'passes supplied value for no_color when provided' do
       no_color = true
 
@@ -566,6 +610,28 @@ describe RakeTerraform::TaskSets::All do
       rake_task = Rake::Task['network:provision']
 
       expect(rake_task.creator.debug).to(eq(false))
+    end
+
+    it 'passes supplied value for input when provided' do
+      input = true
+
+      namespace :network do
+        define_tasks(input: input)
+      end
+
+      rake_task = Rake::Task['network:provision']
+
+      expect(rake_task.creator.input).to(eq(input))
+    end
+
+    it 'passes false for input by default' do
+      namespace :network do
+        define_tasks
+      end
+
+      rake_task = Rake::Task['network:provision']
+
+      expect(rake_task.creator.input).to(eq(false))
     end
 
     it 'passes supplied value for no_color when provided' do
@@ -837,6 +903,28 @@ describe RakeTerraform::TaskSets::All do
       expect(rake_task.creator.debug).to(eq(false))
     end
 
+    it 'passes supplied value for input when provided' do
+      input = true
+
+      namespace :network do
+        define_tasks(input: input)
+      end
+
+      rake_task = Rake::Task['network:destroy']
+
+      expect(rake_task.creator.input).to(eq(input))
+    end
+
+    it 'passes false for input by default' do
+      namespace :network do
+        define_tasks
+      end
+
+      rake_task = Rake::Task['network:destroy']
+
+      expect(rake_task.creator.input).to(eq(false))
+    end
+
     it 'passes supplied value for no_color when provided' do
       no_color = true
 
@@ -1055,6 +1143,28 @@ describe RakeTerraform::TaskSets::All do
       rake_task = Rake::Task['network:output']
 
       expect(rake_task.creator.debug).to(eq(false))
+    end
+
+    it 'passes supplied value for input when provided' do
+      input = true
+
+      namespace :network do
+        define_tasks(input: input)
+      end
+
+      rake_task = Rake::Task['network:output']
+
+      expect(rake_task.creator.input).to(eq(input))
+    end
+
+    it 'passes false for input by default' do
+      namespace :network do
+        define_tasks
+      end
+
+      rake_task = Rake::Task['network:output']
+
+      expect(rake_task.creator.input).to(eq(false))
     end
 
     it 'passes supplied value for no_color when provided' do
