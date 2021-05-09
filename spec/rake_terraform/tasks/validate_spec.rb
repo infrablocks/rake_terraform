@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'ruby_terraform'
 require 'spec_helper'
 
 describe RakeTerraform::Tasks::Validate do
-  include_context :rake
+  include_context 'with rake'
 
-  before(:each) do
+  before do
     namespace :terraform do
       task :ensure
     end
@@ -12,44 +14,51 @@ describe RakeTerraform::Tasks::Validate do
 
   it 'adds a validate task in the namespace in which it is created' do
     namespace :infrastructure do
-      subject.define do |t|
+      described_class.define do |t|
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
       end
     end
 
-    expect(Rake::Task.task_defined?('infrastructure:validate')).to(be(true))
+    expect(
+      Rake::Task.task_defined?(
+        'infrastructure:validate'
+      )
+    ).to(be(true))
   end
 
   it 'gives the validate task a description' do
     namespace :dependency do
-      subject.define(configuration_name: 'network') do |t|
+      described_class.define(configuration_name: 'network') do |t|
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
       end
     end
 
-    expect(Rake::Task["dependency:validate"].full_comment)
-        .to(eq('Validate network using terraform'))
+    expect(Rake::Task['dependency:validate'].full_comment)
+      .to(eq('Validate network using terraform'))
   end
 
   it 'allows the task name to be overridden' do
     namespace :infrastructure do
-      subject.define(name: :validate_network) do |t|
+      described_class.define(name: :validate_network) do |t|
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
       end
     end
 
-    expect(Rake::Task.task_defined?('infrastructure:validate_network'))
-        .to(be(true))
+    expect(
+      Rake::Task.task_defined?(
+        'infrastructure:validate_network'
+      )
+    ).to(be(true))
   end
 
   it 'allows multiple validate tasks to be declared' do
     namespace :infra1 do
-      subject.define do |t|
+      described_class.define do |t|
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
@@ -57,7 +66,7 @@ describe RakeTerraform::Tasks::Validate do
     end
 
     namespace :infra2 do
-      subject.define do |t|
+      described_class.define do |t|
         t.configuration_name = 'database'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
@@ -73,7 +82,7 @@ describe RakeTerraform::Tasks::Validate do
 
   it 'depends on the terraform:ensure task by default' do
     namespace :infrastructure do
-      subject.define do |t|
+      described_class.define do |t|
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
@@ -81,7 +90,7 @@ describe RakeTerraform::Tasks::Validate do
     end
 
     expect(Rake::Task['infrastructure:validate'].prerequisite_tasks)
-        .to(include(Rake::Task['terraform:ensure']))
+      .to(include(Rake::Task['terraform:ensure']))
   end
 
   it 'depends on the provided task if specified' do
@@ -92,7 +101,7 @@ describe RakeTerraform::Tasks::Validate do
     end
 
     namespace :infrastructure do
-      subject.define(ensure_task_name: 'tools:terraform:ensure') do |t|
+      described_class.define(ensure_task_name: 'tools:terraform:ensure') do |t|
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
@@ -100,14 +109,14 @@ describe RakeTerraform::Tasks::Validate do
     end
 
     expect(Rake::Task['infrastructure:validate'].prerequisite_tasks)
-        .to(include(Rake::Task['tools:terraform:ensure']))
+      .to(include(Rake::Task['tools:terraform:ensure']))
   end
 
   it 'configures the task with the provided arguments if specified' do
-    argument_names = [:deployment_identifier, :region]
+    argument_names = %i[deployment_identifier region]
 
     namespace :infrastructure do
-      subject.define(argument_names: argument_names) do |t|
+      described_class.define(argument_names: argument_names) do |t|
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
@@ -115,7 +124,7 @@ describe RakeTerraform::Tasks::Validate do
     end
 
     expect(Rake::Task['infrastructure:validate'].arg_names)
-        .to(eq(argument_names))
+      .to(eq(argument_names))
   end
 
   it 'cleans the work directory' do
@@ -123,22 +132,21 @@ describe RakeTerraform::Tasks::Validate do
     work_directory = 'build'
     configuration_directory = "#{work_directory}/#{source_directory}"
 
-    subject.define do |t|
+    described_class.define do |t|
       t.configuration_name = 'network'
       t.source_directory = source_directory
       t.work_directory = work_directory
     end
 
     stub_puts
-    stub_chdir
-    stub_cp_r
-    stub_mkdir_p
+    stub_fs
     stub_ruby_terraform
 
-    expect(RubyTerraform).to(receive(:clean))
-        .with(directory: configuration_directory)
-
     Rake::Task['validate'].invoke
+
+    expect(RubyTerraform)
+      .to(have_received(:clean)
+            .with(directory: configuration_directory))
   end
 
   it 'recursively makes the parent of the configuration directory' do
@@ -146,23 +154,21 @@ describe RakeTerraform::Tasks::Validate do
     work_directory = 'build'
     parent_of_configuration_directory = "#{work_directory}/infra"
 
-    subject.define do |t|
+    described_class.define do |t|
       t.configuration_name = 'network'
       t.source_directory = source_directory
       t.work_directory = work_directory
     end
 
     stub_puts
-    stub_chdir
-    stub_cp_r
-    stub_mkdir_p
+    stub_fs
     stub_ruby_terraform
 
-    expect_any_instance_of(FileUtils)
-        .to(receive(:mkdir_p))
-        .with(parent_of_configuration_directory, anything)
-
     Rake::Task['validate'].invoke
+
+    expect(FileUtils)
+      .to(have_received(:mkdir_p)
+            .with(parent_of_configuration_directory))
   end
 
   it 'recursively copies the source directory to the work directory' do
@@ -170,23 +176,21 @@ describe RakeTerraform::Tasks::Validate do
     work_directory = 'build'
     configuration_directory = "#{work_directory}/#{source_directory}"
 
-    subject.define do |t|
+    described_class.define do |t|
       t.configuration_name = 'network'
       t.source_directory = source_directory
       t.work_directory = work_directory
     end
 
     stub_puts
-    stub_chdir
-    stub_cp_r
-    stub_mkdir_p
+    stub_fs
     stub_ruby_terraform
 
-    expect_any_instance_of(FileUtils)
-        .to(receive(:cp_r))
-        .with(source_directory, configuration_directory, anything)
-
     Rake::Task['validate'].invoke
+
+    expect(FileUtils)
+      .to(have_received(:cp_r)
+            .with(source_directory, configuration_directory))
   end
 
   it 'switches to the work directory' do
@@ -194,42 +198,41 @@ describe RakeTerraform::Tasks::Validate do
     work_directory = 'build'
     configuration_directory = "#{work_directory}/#{source_directory}"
 
-    subject.define do |t|
+    described_class.define do |t|
       t.configuration_name = 'network'
       t.source_directory = source_directory
       t.work_directory = work_directory
     end
 
     stub_puts
-    stub_chdir
-    stub_cp_r
-    stub_mkdir_p
+    stub_fs
     stub_ruby_terraform
 
-    expect(Dir).to(receive(:chdir)).with(configuration_directory).and_yield
-
     Rake::Task['validate'].invoke
+
+    expect(Dir)
+      .to(have_received(:chdir)
+            .with(configuration_directory))
   end
 
   it 'validates with terraform for the provided configuration directory' do
     source_directory = 'infra/network'
     work_directory = 'build'
 
-    subject.define do |t|
+    described_class.define do |t|
       t.configuration_name = 'network'
       t.source_directory = source_directory
       t.work_directory = work_directory
     end
 
     stub_puts
-    stub_chdir
-    stub_cp_r
-    stub_mkdir_p
+    stub_fs
     stub_ruby_terraform
 
-    expect(RubyTerraform).to(receive(:validate))
-
     Rake::Task['validate'].invoke
+
+    expect(RubyTerraform)
+      .to(have_received(:validate))
   end
 
   it 'uses the provided source directory factory when supplied' do
@@ -238,32 +241,30 @@ describe RakeTerraform::Tasks::Validate do
     source_directory = "#{bucket_name}/#{configuration_name}"
     configuration_directory = "build/#{bucket_name}/#{configuration_name}"
 
-    subject.define(argument_names: [:bucket_name]) do |t, args|
+    described_class.define(argument_names: [:bucket_name]) do |t, args|
       t.configuration_name = configuration_name
       t.source_directory = "#{args.bucket_name}/#{t.configuration_name}"
       t.work_directory = 'build'
     end
 
     stub_puts
-    stub_chdir
-    stub_cp_r
-    stub_mkdir_p
+    stub_fs
     stub_ruby_terraform
 
-    expect_any_instance_of(FileUtils)
-        .to(receive(:cp_r))
-        .with(source_directory, configuration_directory, anything)
-
     Rake::Task['validate'].invoke(bucket_name)
+
+    expect(FileUtils)
+      .to(have_received(:cp_r)
+            .with(source_directory, configuration_directory))
   end
 
   it 'uses the provided vars map in the terraform validate call' do
     vars = {
-        first_thing: '1',
-        second_thing: '2'
+      first_thing: '1',
+      second_thing: '2'
     }
 
-    subject.define do |t|
+    described_class.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
@@ -272,56 +273,54 @@ describe RakeTerraform::Tasks::Validate do
     end
 
     stub_puts
-    stub_chdir
-    stub_cp_r
-    stub_mkdir_p
+    stub_fs
     stub_ruby_terraform
 
-    expect(RubyTerraform)
-        .to(receive(:validate)
-            .with(hash_including(vars: vars)))
-
     Rake::Task['validate'].invoke
+
+    expect(RubyTerraform)
+      .to(have_received(:validate)
+            .with(hash_including(vars: vars)))
   end
 
   it 'uses the provided vars factory in the terraform validate call' do
-    subject.define(argument_names: [:deployment_identifier]) do |t, args|
+    described_class.define(
+      argument_names: [:deployment_identifier]
+    ) do |t, args|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
 
       t.backend_config = {
-          bucket: 'some-bucket'
+        bucket: 'some-bucket'
       }
 
       t.vars = {
-          deployment_identifier: args.deployment_identifier,
-          configuration_name: t.configuration_name,
-          state_bucket: t.backend_config[:bucket]
+        deployment_identifier: args.deployment_identifier,
+        configuration_name: t.configuration_name,
+        state_bucket: t.backend_config[:bucket]
       }
     end
 
     stub_puts
-    stub_chdir
-    stub_cp_r
-    stub_mkdir_p
+    stub_fs
     stub_ruby_terraform
 
-    expect(RubyTerraform)
-        .to(receive(:validate)
-            .with(hash_including(vars: {
-                deployment_identifier: 'staging',
-                configuration_name: 'network',
-                state_bucket: 'some-bucket'
-            })))
-
     Rake::Task['validate'].invoke('staging')
+
+    expect(RubyTerraform)
+      .to(have_received(:validate)
+            .with(hash_including(vars: {
+                                   deployment_identifier: 'staging',
+                                   configuration_name: 'network',
+                                   state_bucket: 'some-bucket'
+                                 })))
   end
 
   it 'uses the provided var file when present' do
     var_file = 'some/terraform.tfvars'
 
-    subject.define do |t|
+    described_class.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
@@ -330,22 +329,20 @@ describe RakeTerraform::Tasks::Validate do
     end
 
     stub_puts
-    stub_chdir
-    stub_cp_r
-    stub_mkdir_p
+    stub_fs
     stub_ruby_terraform
 
-    expect(RubyTerraform)
-        .to(receive(:validate)
-            .with(hash_including(var_file: var_file)))
-
     Rake::Task['validate'].invoke
+
+    expect(RubyTerraform)
+      .to(have_received(:validate)
+            .with(hash_including(var_file: var_file)))
   end
 
   it 'uses the provided state file when present' do
     state_file = 'some/state.tfstate'
 
-    subject.define do |t|
+    described_class.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
@@ -354,64 +351,63 @@ describe RakeTerraform::Tasks::Validate do
     end
 
     stub_puts
-    stub_chdir
-    stub_cp_r
-    stub_mkdir_p
+    stub_fs
     stub_ruby_terraform
 
-    expect(RubyTerraform)
-        .to(receive(:validate)
-            .with(hash_including(state: state_file)))
-
     Rake::Task['validate'].invoke
+
+    expect(RubyTerraform)
+      .to(have_received(:validate)
+            .with(hash_including(state: state_file)))
   end
 
   it 'uses the provided state file factory when present' do
-    subject.define(argument_names: [:deployment_identifier]) do |t, args|
+    described_class.define(
+      argument_names: [:deployment_identifier]
+    ) do |t, args|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
 
       t.state_file =
-          "path/to/state/#{args.deployment_identifier}/" +
-              "#{t.configuration_name}.tfstate"
+        "path/to/state/#{args.deployment_identifier}/" \
+        "#{t.configuration_name}.tfstate"
     end
 
     stub_puts
-    stub_chdir
-    stub_cp_r
-    stub_mkdir_p
+    stub_fs
     stub_ruby_terraform
 
-    expect(RubyTerraform)
-        .to(receive(:validate)
-            .with(hash_including(state: "path/to/state/staging/network.tfstate")))
-
     Rake::Task['validate'].invoke('staging')
+
+    expect(RubyTerraform)
+      .to(have_received(:validate)
+            .with(hash_including(
+                    state: 'path/to/state/staging/network.tfstate'
+                  )))
   end
 
   it 'passes a no_color parameter of false to validate by default' do
-    subject.define do |t|
+    described_class.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
     end
 
     stub_puts
-    stub_chdir
-    stub_cp_r
-    stub_mkdir_p
+    stub_fs
     stub_ruby_terraform
 
-    expect(RubyTerraform)
-        .to(receive(:validate)
-            .with(hash_including(no_color: false)))
-
     Rake::Task['validate'].invoke
+
+    expect(RubyTerraform)
+      .to(have_received(:validate)
+            .with(hash_including(no_color: false)))
   end
 
-  it 'passes the provided value for the no_color parameter to validate when present' do
-    subject.define do |t|
+  it 'passes the provided value for the no_color parameter to validate ' \
+     'when present' do
+    described_class.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
       t.work_directory = 'build'
@@ -419,32 +415,24 @@ describe RakeTerraform::Tasks::Validate do
     end
 
     stub_puts
-    stub_chdir
-    stub_cp_r
-    stub_mkdir_p
+    stub_fs
     stub_ruby_terraform
 
-    expect(RubyTerraform)
-        .to(receive(:validate)
-            .with(hash_including(no_color: true)))
-
     Rake::Task['validate'].invoke
+
+    expect(RubyTerraform)
+      .to(have_received(:validate)
+            .with(hash_including(no_color: true)))
   end
 
   def stub_puts
-    allow_any_instance_of(Kernel).to(receive(:puts))
+    allow(Kernel).to(receive(:puts))
   end
 
-  def stub_chdir
+  def stub_fs
     allow(Dir).to(receive(:chdir)).and_yield
-  end
-
-  def stub_cp_r
-    allow_any_instance_of(FileUtils).to(receive(:cp_r))
-  end
-
-  def stub_mkdir_p
-    allow_any_instance_of(FileUtils).to(receive(:mkdir_p))
+    allow(FileUtils).to(receive(:cp_r))
+    allow(FileUtils).to(receive(:mkdir_p))
   end
 
   def stub_ruby_terraform

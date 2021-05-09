@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'tasks/validate'
 require_relative 'tasks/plan'
 require_relative 'tasks/provision'

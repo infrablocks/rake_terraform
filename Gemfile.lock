@@ -176,7 +176,7 @@ DEPENDENCIES
   activesupport (~> 5.2)
   bundler (~> 2.0)
   fakefs (~> 0.18)
-  gem-release (~> 2.0)
+  gem-release (~> 2.1)
   guard (~> 2.16)
   guard-rspec (~> 4.7)
   rake (~> 13.0)

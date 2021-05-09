@@ -1,0 +1,32 @@
+require:
+  - rubocop-rake
+  - rubocop-rspec
+
+AllCops:
+  NewCops: enable
+
+Layout/LineLength:
+  Max: 80
+
+Metrics/BlockLength:
+  IgnoredMethods:
+    - describe
+    - context
+    - shared_examples
+    - it
+
+Naming/FileName:
+  Exclude:
+    - lib/ruby-terraform.rb
+
+Style/Documentation:
+  Enabled: false
+
+Style/SymbolProc:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Max: 40
+
+RSpec/MultipleExpectations:
+  Enabled: false
