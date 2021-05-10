@@ -16,7 +16,7 @@ module RakeTerraform
       def initialize(*args, &configuration_block)
         @opts = args[0]
         @delegate =
-          RakeDependencies::TaskSets::All.define(
+          RakeDependencies::TaskSets::All.new(
             task_set_opts, &configuration_block
           )
       end
