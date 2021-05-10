@@ -38,7 +38,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 2.6'
 
   spec.add_dependency 'colored2', '~> 3.1'
-  spec.add_dependency 'rake_dependencies', '~> 2.9'
+  spec.add_dependency 'rake_dependencies', '~> 2.11'
   spec.add_dependency 'rake_factory', '~> 0.23'
   spec.add_dependency 'ruby-terraform', '~> 1.1'
 
