@@ -59,7 +59,7 @@ module RakeTerraform
         )
         RubyTerraform.destroy(
           chdir: configuration_directory,
-          force: true,
+          auto_approve: true,
           input: t.input,
           no_color: t.no_color,
           no_backup: t.no_backup,

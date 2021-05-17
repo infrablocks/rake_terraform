@@ -632,7 +632,7 @@ describe RakeTerraform::Tasks::Destroy do
             .with(hash_including(backup: backup_file)))
   end
 
-  it 'passes force as true to destroy' do
+  it 'passes auto_approve as true to destroy' do
     described_class.define do |t|
       t.configuration_name = 'network'
       t.source_directory = 'infra/network'
@@ -647,7 +647,7 @@ describe RakeTerraform::Tasks::Destroy do
 
     expect(RubyTerraform)
       .to(have_received(:destroy)
-            .with(hash_including(force: true)))
+            .with(hash_including(auto_approve: true)))
   end
 
   def stub_puts
