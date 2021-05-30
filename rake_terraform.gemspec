@@ -18,8 +18,8 @@ files = %w[
 Gem::Specification.new do |spec|
   spec.name = 'rake_terraform'
   spec.version = RakeTerraform::VERSION
-  spec.authors = ['Toby Clemson']
-  spec.email = ['tobyclemson@gmail.com']
+  spec.authors = ['InfraBlocks Maintainers']
+  spec.email = ['maintainers@infrablocks.io']
 
   spec.summary = 'Rake tasks for running terraform.'
   spec.description =
