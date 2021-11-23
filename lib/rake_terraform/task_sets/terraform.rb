@@ -148,7 +148,7 @@ module RakeTerraform
       def log_version_lookup(command)
         logger.info(
           'Fetching terraform version information using command: ' \
-            "#{command}"
+          "#{command}"
         )
       end
 

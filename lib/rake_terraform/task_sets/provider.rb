@@ -115,9 +115,9 @@ module RakeTerraform
       def uri_template
         @uri_template ||=
           "https://github.com/#{repository}/releases/" \
-              'download/<%= @version %>/' \
-              "#{dependency}_v<%= @version %>_<%= @os_id %>" \
-              '_amd64<%= @ext %>'
+          'download/<%= @version %>/' \
+          "#{dependency}_v<%= @version %>_<%= @os_id %>" \
+          '_amd64<%= @ext %>'
       end
 
       def file_name_template
@@ -154,7 +154,7 @@ module RakeTerraform
       def log_binary_location(binary)
         logger.info(
           "Terraform provider binary for: #{name} " \
-                             "should be at: #{binary}"
+          "should be at: #{binary}"
         )
       end
 

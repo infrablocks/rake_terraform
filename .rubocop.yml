@@ -30,3 +30,6 @@ RSpec/ExampleLength:
 
 RSpec/MultipleExpectations:
   Enabled: false
+
+Gemspec/RequireMFA:
+  Enabled: false

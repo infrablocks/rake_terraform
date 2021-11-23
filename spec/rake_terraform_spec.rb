@@ -118,8 +118,8 @@ RSpec.describe RakeTerraform do
 
         expect(task_set.uri_template)
           .to(eq('https://releases.hashicorp.com/terraform/' \
-                '<%= @version %>/terraform_<%= @version %>' \
-                '_<%= @os_id %>_amd64<%= @ext %>'))
+                 '<%= @version %>/terraform_<%= @version %>' \
+                 '_<%= @os_id %>_amd64<%= @ext %>'))
       end
 
       it 'uses the correct file name template' do
@@ -127,7 +127,7 @@ RSpec.describe RakeTerraform do
 
         expect(task_set.file_name_template)
           .to(eq('terraform_<%= @version %>_<%= @os_id %>' \
-                '_amd64<%= @ext %>'))
+                 '_amd64<%= @ext %>'))
       end
 
       # TODO: test needs_fetch more thoroughly
@@ -341,9 +341,9 @@ RSpec.describe RakeTerraform do
 
         expect(provider_task_sets[0].uri_template)
           .to(eq('https://github.com/example/repository1/releases/' \
-                'download/<%= @version %>/' \
-                'terraform-provider-something1_v<%= @version %>_' \
-                '<%= @os_id %>_amd64<%= @ext %>'))
+                 'download/<%= @version %>/' \
+                 'terraform-provider-something1_v<%= @version %>_' \
+                 '<%= @os_id %>_amd64<%= @ext %>'))
       end
 
       it 'constructs a file name template based on the provided name' do
@@ -364,7 +364,7 @@ RSpec.describe RakeTerraform do
 
         expect(provider_task_sets[0].file_name_template)
           .to(eq('terraform-provider-something1_v<%= @version %>_' \
-                '<%= @os_id %>_amd64<%= @ext %>'))
+                 '<%= @os_id %>_amd64<%= @ext %>'))
       end
 
       it 'passes source and target binary name templates' do
