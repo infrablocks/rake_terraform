@@ -24,7 +24,7 @@ GEM
     diff-lcs (1.4.4)
     docile (1.4.0)
     excon (0.88.0)
-    fakefs (0.20.1)
+    fakefs (1.4.0)
     faraday (1.8.0)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
@@ -184,7 +184,7 @@ PLATFORMS
 DEPENDENCIES
   activesupport (~> 5.2)
   bundler (~> 2.0)
-  fakefs (~> 0.18)
+  fakefs (~> 1.4)
   gem-release (~> 2.1)
   guard (~> 2.16)
   guard-rspec (~> 4.7)
