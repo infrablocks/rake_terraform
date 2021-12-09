@@ -42,7 +42,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rake_factory', '~> 0.23'
   spec.add_dependency 'ruby-terraform', '~> 1.3.1'
 
-  spec.add_development_dependency 'activesupport', '~> 5.2'
+  spec.add_development_dependency 'activesupport', '~> 6.1'
   spec.add_development_dependency 'bundler', '~> 2.0'
   spec.add_development_dependency 'fakefs', '~> 0.18'
   spec.add_development_dependency 'gem-release', '~> 2.1'
