@@ -25,7 +25,7 @@ GEM
     diff-lcs (1.4.4)
     docile (1.4.0)
     excon (0.88.0)
-    fakefs (1.4.0)
+    fakefs (1.4.1)
     faraday (1.8.0)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
