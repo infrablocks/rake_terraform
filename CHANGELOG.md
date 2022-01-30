@@ -1,3 +1,11 @@
+## Unreleased
+
+## 1.21.0 (Jan 30th, 2022)
+
+IMPROVEMENTS
+
+* Upgrade to latest ruby_terraform.
+
 ## 0.17.0 (May 1st, 2018)
 
 IMPROVEMENTS:
