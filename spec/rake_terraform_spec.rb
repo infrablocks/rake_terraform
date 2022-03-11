@@ -5,7 +5,7 @@ require 'spec_helper'
 
 RSpec.describe RakeTerraform do
   it 'has a version number' do
-    expect(RakeTerraform::VERSION).not_to be nil
+    expect(RakeTerraform::VERSION).not_to be_nil
   end
 
   describe '.define_command_tasks' do

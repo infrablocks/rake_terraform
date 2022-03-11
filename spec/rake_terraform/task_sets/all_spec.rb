@@ -90,7 +90,7 @@ describe RakeTerraform::TaskSets::All do
 
       rake_task = Rake::Task['network:validate']
 
-      expect(rake_task.creator.debug).to(eq(false))
+      expect(rake_task.creator.debug).to(be(false))
     end
 
     it 'passes supplied value for input when provided' do
@@ -112,7 +112,7 @@ describe RakeTerraform::TaskSets::All do
 
       rake_task = Rake::Task['network:validate']
 
-      expect(rake_task.creator.input).to(eq(false))
+      expect(rake_task.creator.input).to(be(false))
     end
 
     it 'passes supplied value for no_color when provided' do
@@ -124,7 +124,7 @@ describe RakeTerraform::TaskSets::All do
 
       rake_task = Rake::Task['network:validate']
 
-      expect(rake_task.creator.no_color).to(eq(true))
+      expect(rake_task.creator.no_color).to(be(true))
     end
 
     it 'uses default for no_color by default' do
@@ -134,7 +134,7 @@ describe RakeTerraform::TaskSets::All do
 
       rake_task = Rake::Task['network:validate']
 
-      expect(rake_task.creator.no_color).to(eq(false))
+      expect(rake_task.creator.no_color).to(be(false))
     end
 
     it 'passes provided ensure task when present' do
@@ -362,7 +362,7 @@ describe RakeTerraform::TaskSets::All do
 
       rake_task = Rake::Task['network:plan']
 
-      expect(rake_task.creator.debug).to(eq(false))
+      expect(rake_task.creator.debug).to(be(false))
     end
 
     it 'passes supplied value for input when provided' do
@@ -384,7 +384,7 @@ describe RakeTerraform::TaskSets::All do
 
       rake_task = Rake::Task['network:plan']
 
-      expect(rake_task.creator.input).to(eq(false))
+      expect(rake_task.creator.input).to(be(false))
     end
 
     it 'passes supplied value for no_color when provided' do
@@ -406,7 +406,7 @@ describe RakeTerraform::TaskSets::All do
 
       rake_task = Rake::Task['network:plan']
 
-      expect(rake_task.creator.no_color).to(eq(false))
+      expect(rake_task.creator.no_color).to(be(false))
     end
 
     it 'passes provided ensure task when present' do
@@ -609,7 +609,7 @@ describe RakeTerraform::TaskSets::All do
 
       rake_task = Rake::Task['network:provision']
 
-      expect(rake_task.creator.debug).to(eq(false))
+      expect(rake_task.creator.debug).to(be(false))
     end
 
     it 'passes supplied value for input when provided' do
@@ -631,7 +631,7 @@ describe RakeTerraform::TaskSets::All do
 
       rake_task = Rake::Task['network:provision']
 
-      expect(rake_task.creator.input).to(eq(false))
+      expect(rake_task.creator.input).to(be(false))
     end
 
     it 'passes supplied value for no_color when provided' do
@@ -653,7 +653,7 @@ describe RakeTerraform::TaskSets::All do
 
       rake_task = Rake::Task['network:provision']
 
-      expect(rake_task.creator.no_color).to(eq(false))
+      expect(rake_task.creator.no_color).to(be(false))
     end
 
     it 'passes supplied value for no_backup when provided' do
@@ -675,7 +675,7 @@ describe RakeTerraform::TaskSets::All do
 
       rake_task = Rake::Task['network:provision']
 
-      expect(rake_task.creator.no_backup).to(eq(false))
+      expect(rake_task.creator.no_backup).to(be(false))
     end
 
     it 'passes provided backup file when present' do
@@ -900,7 +900,7 @@ describe RakeTerraform::TaskSets::All do
 
       rake_task = Rake::Task['network:destroy']
 
-      expect(rake_task.creator.debug).to(eq(false))
+      expect(rake_task.creator.debug).to(be(false))
     end
 
     it 'passes supplied value for input when provided' do
@@ -922,7 +922,7 @@ describe RakeTerraform::TaskSets::All do
 
       rake_task = Rake::Task['network:destroy']
 
-      expect(rake_task.creator.input).to(eq(false))
+      expect(rake_task.creator.input).to(be(false))
     end
 
     it 'passes supplied value for no_color when provided' do
@@ -944,7 +944,7 @@ describe RakeTerraform::TaskSets::All do
 
       rake_task = Rake::Task['network:destroy']
 
-      expect(rake_task.creator.no_color).to(eq(false))
+      expect(rake_task.creator.no_color).to(be(false))
     end
 
     it 'passes supplied value for no_backup when provided' do
@@ -966,7 +966,7 @@ describe RakeTerraform::TaskSets::All do
 
       rake_task = Rake::Task['network:destroy']
 
-      expect(rake_task.creator.no_backup).to(eq(false))
+      expect(rake_task.creator.no_backup).to(be(false))
     end
 
     it 'passes provided backup file when present' do
@@ -1142,7 +1142,7 @@ describe RakeTerraform::TaskSets::All do
 
       rake_task = Rake::Task['network:output']
 
-      expect(rake_task.creator.debug).to(eq(false))
+      expect(rake_task.creator.debug).to(be(false))
     end
 
     it 'passes supplied value for input when provided' do
@@ -1164,7 +1164,7 @@ describe RakeTerraform::TaskSets::All do
 
       rake_task = Rake::Task['network:output']
 
-      expect(rake_task.creator.input).to(eq(false))
+      expect(rake_task.creator.input).to(be(false))
     end
 
     it 'passes supplied value for no_color when provided' do
@@ -1186,7 +1186,7 @@ describe RakeTerraform::TaskSets::All do
 
       rake_task = Rake::Task['network:output']
 
-      expect(rake_task.creator.no_color).to(eq(false))
+      expect(rake_task.creator.no_color).to(be(false))
     end
 
     it 'passes supplied value for no_print_output when provided' do
@@ -1208,7 +1208,7 @@ describe RakeTerraform::TaskSets::All do
 
       rake_task = Rake::Task['network:output']
 
-      expect(rake_task.creator.no_print_output).to(eq(false))
+      expect(rake_task.creator.no_print_output).to(be(false))
     end
 
     it 'passes provided ensure task when present' do
@@ -1236,13 +1236,13 @@ describe RakeTerraform::TaskSets::All do
     it 'uses a name of output by default' do
       define_tasks
 
-      expect(Rake::Task.task_defined?('output')).to(eq(true))
+      expect(Rake::Task.task_defined?('output')).to(be(true))
     end
 
     it 'uses the provided name when supplied' do
       define_tasks(output_task_name: :print_output)
 
-      expect(Rake::Task.task_defined?('print_output')).to(eq(true))
+      expect(Rake::Task.task_defined?('print_output')).to(be(true))
     end
 
     it 'passes the provided output argument names when supplied' do

@@ -24,9 +24,9 @@ GEM
     concurrent-ruby (1.1.9)
     diff-lcs (1.5.0)
     docile (1.4.0)
-    excon (0.90.0)
+    excon (0.91.0)
     fakefs (1.4.1)
-    faraday (1.9.3)
+    faraday (1.10.0)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
       faraday-excon (~> 1.1)
@@ -124,7 +124,7 @@ GEM
       colored2 (~> 3.1)
       rake_factory (~> 0.23)
       sshkey (~> 2.0)
-    rb-fsevent (0.11.0)
+    rb-fsevent (0.11.1)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
     regexp_parser (2.2.1)
@@ -155,7 +155,7 @@ GEM
       parser (>= 3.1.1.0)
     rubocop-rake (0.6.0)
       rubocop (~> 1.0)
-    rubocop-rspec (2.8.0)
+    rubocop-rspec (2.9.0)
       rubocop (~> 1.19)
     ruby-progressbar (1.11.0)
     ruby-terraform (1.4.0)
@@ -174,7 +174,7 @@ GEM
       simplecov-html (~> 0.11)
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.12.3)
-    simplecov_json_formatter (0.1.3)
+    simplecov_json_formatter (0.1.4)
     sshkey (2.0.0)
     thor (1.2.1)
     tzinfo (2.0.4)
@@ -209,4 +209,4 @@ DEPENDENCIES
   yard (~> 0.9)
 
 BUNDLED WITH
-   2.3.6
+   2.3.9

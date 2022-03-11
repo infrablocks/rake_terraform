@@ -7,8 +7,8 @@ module RakeTerraform
     # rubocop:disable Metrics/ClassLength
 
     class Provider
-      def self.define(*args, &configuration_block)
-        new(*args, &configuration_block).define_on(Rake.application)
+      def self.define(...)
+        new(...).define_on(Rake.application)
       end
 
       attr_reader :delegate
