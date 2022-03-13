@@ -10,12 +10,11 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (6.1.5)
+    activesupport (7.0.2.3)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
-      zeitwerk (~> 2.3)
     addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
     ast (2.4.2)
@@ -24,7 +23,7 @@ GEM
     concurrent-ruby (1.1.9)
     diff-lcs (1.5.0)
     docile (1.4.0)
-    excon (0.91.0)
+    excon (0.92.0)
     fakefs (1.4.1)
     faraday (1.10.0)
       faraday-em_http (~> 1.0)
@@ -104,7 +103,7 @@ GEM
       excon (~> 0.72)
       rake_factory (~> 0.23)
       sshkey (~> 2.0)
-    rake_dependencies (2.11.0)
+    rake_dependencies (2.13.0)
       hamster (~> 3.0)
       minitar (~> 0.9)
       rake_factory (~> 0.23)
@@ -183,30 +182,29 @@ GEM
     webrick (1.7.0)
     yard (0.9.27)
       webrick (~> 1.7.0)
-    zeitwerk (2.5.4)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  activesupport (~> 6.1)
-  bundler (~> 2.0)
-  fakefs (~> 1.4)
-  gem-release (~> 2.1)
-  guard (~> 2.16)
-  guard-rspec (~> 4.7)
-  rake (~> 13.0)
-  rake_circle_ci (~> 0.9)
-  rake_github (~> 0.5)
-  rake_gpg (~> 0.12)
-  rake_ssh (~> 0.4)
+  activesupport
+  bundler
+  fakefs
+  gem-release
+  guard
+  guard-rspec
+  rake
+  rake_circle_ci
+  rake_github
+  rake_gpg
+  rake_ssh
   rake_terraform!
-  rspec (~> 3.9)
-  rubocop (~> 1.12)
-  rubocop-rake (~> 0.5)
-  rubocop-rspec (~> 2.2)
-  simplecov (~> 0.21)
-  yard (~> 0.9)
+  rspec
+  rubocop
+  rubocop-rake
+  rubocop-rspec
+  simplecov
+  yard
 
 BUNDLED WITH
    2.3.9
