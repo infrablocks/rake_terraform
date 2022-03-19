@@ -42,7 +42,8 @@ module RakeTerraform
           path: path,
           type: type,
 
-          os_ids: os_ids,
+          platform_os_names: platform_os_names,
+          platform_cpu_names: platform_cpu_names,
 
           uri_template: uri_template,
           file_name_template: file_name_template,
@@ -91,19 +92,37 @@ module RakeTerraform
         @type ||= :zip
       end
 
-      def os_ids
-        @os_ids ||= { mac: 'darwin', linux: 'linux' }
+      def platform_os_names
+        @platform_os_names ||= {
+          darwin: 'darwin',
+          linux: 'linux',
+          mswin32: 'windows',
+          mswin64: 'windows'
+        }
       end
+
+      # rubocop:disable Naming/VariableNumber
+      def platform_cpu_names
+        @platform_cpu_names ||= {
+          x86_64: 'amd64',
+          x86: '386',
+          x64: 'amd64',
+          arm64: 'arm64'
+        }
+      end
+      # rubocop:enable Naming/VariableNumber
 
       def uri_template
         @uri_template ||=
           'https://releases.hashicorp.com/terraform/<%= @version %>/' \
-          'terraform_<%= @version %>_<%= @os_id %>_amd64<%= @ext %>'
+          'terraform_<%= @version %>_' \
+          '<%= @platform_os_name %>_<%= @platform_cpu_name %><%= @ext %>'
       end
 
       def file_name_template
         @file_name_template ||=
-          'terraform_<%= @version %>_<%= @os_id %>_amd64<%= @ext %>'
+          'terraform_<%= @version %>_' \
+          '<%= @platform_os_name %>_<%= @platform_cpu_name %><%= @ext %>'
       end
 
       def needs_fetch

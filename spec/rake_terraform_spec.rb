@@ -107,27 +107,49 @@ RSpec.describe RakeTerraform do
         expect(task_set.type).to(eq(:zip))
       end
 
-      it 'uses os_ids of darwin and linux' do
+      it 'uses platform OS names of darwin, linux and windows' do
         task_set, = described_class.define_installation_tasks
 
-        expect(task_set.os_ids).to(eq({ mac: 'darwin', linux: 'linux' }))
+        expect(task_set.platform_os_names)
+          .to(eq({
+                   darwin: 'darwin',
+                   linux: 'linux',
+                   mswin32: 'windows',
+                   mswin64: 'windows'
+                 }))
       end
+
+      # rubocop:disable Naming/VariableNumber
+      it 'uses the correct platform CPU names' do
+        task_set, = described_class.define_installation_tasks
+
+        expect(task_set.platform_cpu_names)
+          .to(eq({
+                   x86_64: 'amd64',
+                   x86: '386',
+                   x64: 'amd64',
+                   arm64: 'arm64'
+                 }))
+      end
+      # rubocop:enable Naming/VariableNumber
 
       it 'uses the correct URI template' do
         task_set, = described_class.define_installation_tasks
 
         expect(task_set.uri_template)
           .to(eq('https://releases.hashicorp.com/terraform/' \
-                 '<%= @version %>/terraform_<%= @version %>' \
-                 '_<%= @os_id %>_amd64<%= @ext %>'))
+                 '<%= @version %>/terraform_<%= @version %>_' \
+                 '<%= @platform_os_name %>_<%= @platform_cpu_name %>' \
+                 '<%= @ext %>'))
       end
 
       it 'uses the correct file name template' do
         task_set, = described_class.define_installation_tasks
 
         expect(task_set.file_name_template)
-          .to(eq('terraform_<%= @version %>_<%= @os_id %>' \
-                 '_amd64<%= @ext %>'))
+          .to(eq('terraform_<%= @version %>_' \
+                 '<%= @platform_os_name %>_<%= @platform_cpu_name %>' \
+                 '<%= @ext %>'))
       end
 
       # TODO: test needs_fetch more thoroughly
@@ -302,7 +324,7 @@ RSpec.describe RakeTerraform do
         expect(provider_task_sets[0].type).to(eq(:tar_gz))
       end
 
-      it 'passes the correct OS IDs for golang binary defaults' do
+      it 'passes the correct platform OS names for golang binary defaults' do
         _, provider_task_sets = described_class.define_installation_tasks(
           {
             providers: [
@@ -318,9 +340,41 @@ RSpec.describe RakeTerraform do
           }
         )
 
-        expect(provider_task_sets[0].os_ids)
-          .to(eq({ mac: 'darwin', linux: 'linux' }))
+        expect(provider_task_sets[0].platform_os_names)
+          .to(eq({
+                   darwin: 'darwin',
+                   linux: 'linux',
+                   mswin32: 'windows',
+                   mswin64: 'windows'
+                 }))
       end
+
+      # rubocop:disable Naming/VariableNumber
+      it 'passes the correct platform CPU names for golang binary defaults' do
+        _, provider_task_sets = described_class.define_installation_tasks(
+          {
+            providers: [
+              {
+                name: 'something1',
+                path: File.join(
+                  'vendor', 'terraform-provider-something1'
+                ),
+                version: '1.1.1',
+                repository: 'example/repository1'
+              }
+            ]
+          }
+        )
+
+        expect(provider_task_sets[0].platform_cpu_names)
+          .to(eq({
+                   x86_64: 'amd64',
+                   x86: '386',
+                   x64: 'amd64',
+                   arm64: 'arm64'
+                 }))
+      end
+      # rubocop:enable Naming/VariableNumber
 
       it 'constructs a github release URL based on the provided repository ' \
          'and name' do
@@ -343,7 +397,8 @@ RSpec.describe RakeTerraform do
           .to(eq('https://github.com/example/repository1/releases/' \
                  'download/<%= @version %>/' \
                  'terraform-provider-something1_v<%= @version %>_' \
-                 '<%= @os_id %>_amd64<%= @ext %>'))
+                 '<%= @platform_os_name %>_<%= @platform_cpu_name %>' \
+                 '<%= @ext %>'))
       end
 
       it 'constructs a file name template based on the provided name' do
@@ -364,7 +419,8 @@ RSpec.describe RakeTerraform do
 
         expect(provider_task_sets[0].file_name_template)
           .to(eq('terraform-provider-something1_v<%= @version %>_' \
-                 '<%= @os_id %>_amd64<%= @ext %>'))
+                 '<%= @platform_os_name %>_<%= @platform_cpu_name %>' \
+                 '<%= @ext %>'))
       end
 
       it 'passes source and target binary name templates' do

@@ -15,9 +15,10 @@ module RakeTerraform
 
       def initialize(*args, &configuration_block)
         @opts = args[0]
-        @delegate = RakeDependencies::TaskSets::All.new(
-          task_set_opts, &configuration_block
-        )
+        @delegate =
+          RakeDependencies::TaskSets::All.new(
+            task_set_opts, &configuration_block
+          )
       end
 
       def define_on(application)
@@ -41,7 +42,8 @@ module RakeTerraform
           path: path,
           type: type,
 
-          os_ids: os_ids,
+          platform_os_names: platform_os_names,
+          platform_cpu_names: platform_cpu_names,
 
           uri_template: uri_template,
           file_name_template: file_name_template,
@@ -108,21 +110,38 @@ module RakeTerraform
         @type ||= :tar_gz
       end
 
-      def os_ids
-        @os_ids ||= { mac: 'darwin', linux: 'linux' }
+      def platform_os_names
+        @platform_os_names ||= {
+          darwin: 'darwin',
+          linux: 'linux',
+          mswin32: 'windows',
+          mswin64: 'windows'
+        }
       end
+
+      # rubocop:disable Naming/VariableNumber
+      def platform_cpu_names
+        @platform_cpu_names ||= {
+          x86_64: 'amd64',
+          x86: '386',
+          x64: 'amd64',
+          arm64: 'arm64'
+        }
+      end
+      # rubocop:enable Naming/VariableNumber
 
       def uri_template
         @uri_template ||=
           "https://github.com/#{repository}/releases/" \
           'download/<%= @version %>/' \
-          "#{dependency}_v<%= @version %>_<%= @os_id %>" \
-          '_amd64<%= @ext %>'
+          "#{dependency}_v<%= @version %>_" \
+          '<%= @platform_os_name %>_<%= @platform_cpu_name %><%= @ext %>'
       end
 
       def file_name_template
         @file_name_template ||=
-          "#{dependency}_v<%= @version %>_<%= @os_id %>_amd64<%= @ext %>"
+          "#{dependency}_v<%= @version %>_" \
+          '<%= @platform_os_name %>_<%= @platform_cpu_name %><%= @ext %>'
       end
 
       def source_binary_name_template
