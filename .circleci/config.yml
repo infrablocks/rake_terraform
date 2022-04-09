@@ -43,9 +43,9 @@ commands:
           template: SLACK_SUCCESS_NOTIFICATION
   configure_tools:
     steps:
-      - run: ./scripts/ci/common/install-orb-deps.sh
       - run: ./scripts/ci/common/install-git-crypt.sh
       - run: ./scripts/ci/common/install-gpg-key.sh
+      - run: ./scripts/ci/common/install-orb-deps.sh
       - run: ./scripts/ci/common/configure-git.sh
       - run: ./scripts/ci/common/configure-rubygems.sh
 
