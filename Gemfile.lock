@@ -157,7 +157,7 @@ GEM
     rubocop-rspec (2.11.1)
       rubocop (~> 1.19)
     ruby-progressbar (1.11.0)
-    ruby-terraform (1.4.0)
+    ruby-terraform (1.5.0)
       immutable-struct (~> 2.4)
       lino (~> 3.0)
     ruby2_keywords (0.0.5)
