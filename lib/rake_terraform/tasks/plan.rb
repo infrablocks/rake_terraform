@@ -20,6 +20,8 @@ module RakeTerraform
       parameter :source_directory, required: true
       parameter :work_directory, required: true
 
+      parameter :environment, default: {}
+
       parameter :backend_config
 
       parameter :vars, default: {}
@@ -35,37 +37,56 @@ module RakeTerraform
 
       parameter :ensure_task_name, default: :'terraform:ensure'
 
-      action do |t|
-        Colored2.disable! if t.no_color
+      action do |task|
+        Colored2.disable! if task.no_color
 
         module_directory =
-          File.join(FileUtils.pwd, t.source_directory)
+          File.join(FileUtils.pwd, task.source_directory)
         configuration_directory =
-          File.join(t.work_directory, t.source_directory)
+          File.join(task.work_directory, task.source_directory)
 
         Kernel.puts("Planning #{configuration_name}".cyan)
 
+        prepare_configuration_directory(configuration_directory)
+        init_configuration(configuration_directory, module_directory, task)
+        plan_configuration(configuration_directory, task)
+      end
+
+      def prepare_configuration_directory(configuration_directory)
         FileUtils.rm_rf(configuration_directory)
         FileUtils.mkdir_p(configuration_directory)
+      end
 
+      def init_configuration(configuration_directory, module_directory, task)
         RubyTerraform.init(
-          chdir: configuration_directory,
-          from_module: module_directory,
-          backend_config: t.backend_config,
-          no_color: t.no_color,
-          input: t.input
-        )
-        RubyTerraform.plan(
-          chdir: configuration_directory,
-          input: t.input,
-          no_color: t.no_color,
-          destroy: t.destroy,
-          state: t.state_file,
-          plan: t.plan_file,
-          vars: t.vars,
-          var_file: t.var_file
+          {
+            chdir: configuration_directory,
+            from_module: module_directory,
+            backend_config: task.backend_config,
+            no_color: task.no_color,
+            input: task.input
+          },
+          { environment: task.environment }
         )
       end
+
+      # rubocop:disable Metrics/MethodLength
+      def plan_configuration(configuration_directory, task)
+        RubyTerraform.plan(
+          {
+            chdir: configuration_directory,
+            input: task.input,
+            no_color: task.no_color,
+            destroy: task.destroy,
+            state: task.state_file,
+            plan: task.plan_file,
+            vars: task.vars,
+            var_file: task.var_file
+          },
+          { environment: task.environment }
+        )
+      end
+      # rubocop:enable Metrics/MethodLength
     end
   end
 end

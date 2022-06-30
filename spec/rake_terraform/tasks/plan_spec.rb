@@ -204,7 +204,7 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
       .to(have_received(:init)
-            .with(hash_including(chdir: configuration_directory)))
+            .with(hash_including(chdir: configuration_directory), anything))
   end
 
   it 'passes the absolute source directory as from module parameter to init' do
@@ -231,7 +231,8 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
       .to(have_received(:init)
-            .with(hash_including(from_module: absolute_source_directory)))
+            .with(hash_including(from_module: absolute_source_directory),
+                  anything))
   end
 
   it 'passes an input parameter of false to init by default' do
@@ -249,7 +250,7 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
       .to(have_received(:init)
-            .with(hash_including(input: false)))
+            .with(hash_including(input: false), anything))
   end
 
   it 'passes the provided value for the input parameter to init ' \
@@ -270,7 +271,7 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
       .to(have_received(:init)
-            .with(hash_including(input: true)))
+            .with(hash_including(input: true), anything))
   end
 
   it 'passes a no_color parameter of false to init by default' do
@@ -288,7 +289,50 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
       .to(have_received(:init)
-            .with(hash_including(no_color: false)))
+            .with(hash_including(no_color: false), anything))
+  end
+
+  it 'passes an empty environment parameter to init by default' do
+    described_class.define do |t|
+      t.configuration_name = 'network'
+      t.source_directory = 'infra/network'
+      t.work_directory = 'build'
+    end
+
+    stub_puts
+    stub_fs
+    stub_ruby_terraform
+
+    Rake::Task['plan'].invoke
+
+    expect(RubyTerraform)
+      .to(have_received(:init)
+            .with(anything, { environment: {} }))
+  end
+
+  it 'passes the provided value for the environment parameter to init ' \
+     'when present' do
+    environment = {
+      'SOME_ENV' => 'some-value'
+    }
+
+    described_class.define do |t|
+      t.configuration_name = 'network'
+      t.source_directory = 'infra/network'
+      t.work_directory = 'build'
+
+      t.environment = environment
+    end
+
+    stub_puts
+    stub_fs
+    stub_ruby_terraform
+
+    Rake::Task['plan'].invoke
+
+    expect(RubyTerraform)
+      .to(have_received(:init)
+            .with(anything, { environment: environment }))
   end
 
   it 'passes the provided value for the no_color parameter to init ' \
@@ -309,7 +353,7 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
       .to(have_received(:init)
-            .with(hash_including(no_color: true)))
+            .with(hash_including(no_color: true), anything))
   end
 
   it 'passes the provided backend config to init when present' do
@@ -341,7 +385,8 @@ describe RakeTerraform::Tasks::Plan do
                       key: 'network.tfstate',
                       region: 'eu-west-2'
                     }
-                  )))
+                  ),
+                  anything))
   end
 
   it 'plans the configuration' do
@@ -361,7 +406,7 @@ describe RakeTerraform::Tasks::Plan do
     Rake::Task['plan'].invoke
 
     expect(RubyTerraform)
-      .to(have_received(:plan))
+      .to(have_received(:plan), anything)
   end
 
   it 'passes the configuration directory as chdir parameter to plan' do
@@ -383,7 +428,7 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
       .to(have_received(:plan)
-            .with(hash_including(chdir: configuration_directory)))
+            .with(hash_including(chdir: configuration_directory), anything))
   end
 
   it 'uses the provided vars map in the terraform plan call' do
@@ -419,7 +464,8 @@ describe RakeTerraform::Tasks::Plan do
                       configuration_name: 'network',
                       state_bucket: 'some-bucket'
                     }
-                  )))
+                  ),
+                  anything))
   end
 
   it 'uses the provided var file when present' do
@@ -441,7 +487,7 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
       .to(have_received(:plan)
-            .with(hash_including(var_file: var_file)))
+            .with(hash_including(var_file: var_file), anything))
   end
 
   it 'uses the provided state file when present' do
@@ -467,7 +513,8 @@ describe RakeTerraform::Tasks::Plan do
       .to(have_received(:plan)
             .with(hash_including(
                     state: 'path/to/state/staging/network.tfstate'
-                  )))
+                  ),
+                  anything))
   end
 
   it 'uses the provided plan file when present' do
@@ -489,7 +536,7 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
       .to(have_received(:plan)
-            .with(hash_including(plan: plan_file)))
+            .with(hash_including(plan: plan_file), anything))
   end
 
   it 'passes an input parameter of false to plan by default' do
@@ -507,7 +554,7 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
       .to(have_received(:plan)
-            .with(hash_including(input: false)))
+            .with(hash_including(input: false), anything))
   end
 
   it 'passes the provided value for the input parameter to plan ' \
@@ -528,7 +575,7 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
       .to(have_received(:plan)
-            .with(hash_including(input: true)))
+            .with(hash_including(input: true), anything))
   end
 
   it 'passes a no_color parameter of false to plan by default' do
@@ -546,7 +593,7 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
       .to(have_received(:plan)
-            .with(hash_including(no_color: false)))
+            .with(hash_including(no_color: false), anything))
   end
 
   it 'passes the provided value for the no_color parameter to plan ' \
@@ -566,7 +613,50 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
       .to(have_received(:plan)
-            .with(hash_including(no_color: true)))
+            .with(hash_including(no_color: true), anything))
+  end
+
+  it 'passes an empty environment parameter to plan by default' do
+    described_class.define do |t|
+      t.configuration_name = 'network'
+      t.source_directory = 'infra/network'
+      t.work_directory = 'build'
+    end
+
+    stub_puts
+    stub_fs
+    stub_ruby_terraform
+
+    Rake::Task['plan'].invoke
+
+    expect(RubyTerraform)
+      .to(have_received(:plan)
+            .with(anything, { environment: {} }))
+  end
+
+  it 'passes the provided value for the environment parameter to plan ' \
+     'when present' do
+    environment = {
+      'SOME_ENV' => 'some-value'
+    }
+
+    described_class.define do |t|
+      t.configuration_name = 'network'
+      t.source_directory = 'infra/network'
+      t.work_directory = 'build'
+
+      t.environment = environment
+    end
+
+    stub_puts
+    stub_fs
+    stub_ruby_terraform
+
+    Rake::Task['plan'].invoke
+
+    expect(RubyTerraform)
+      .to(have_received(:plan)
+            .with(anything, { environment: environment }))
   end
 
   it 'passes a destroy parameter of false to plan by default' do
@@ -584,7 +674,7 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
       .to(have_received(:plan)
-            .with(hash_including(destroy: false)))
+            .with(hash_including(destroy: false), anything))
   end
 
   it 'passes the provided value for the destroy parameter to plan ' \
@@ -604,7 +694,7 @@ describe RakeTerraform::Tasks::Plan do
 
     expect(RubyTerraform)
       .to(have_received(:plan)
-            .with(hash_including(destroy: true)))
+            .with(hash_including(destroy: true), anything))
   end
 
   def stub_puts
