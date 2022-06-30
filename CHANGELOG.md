@@ -1,6 +1,18 @@
 ## Unreleased
 
-## 1.21.0 (Jan 30th, 2022)
+## 1.23.0 (June 30th, 2022)
+
+IMPROVEMENTS
+
+* Allow environment to be provided for command invocation.
+
+## 1.22.0 (March 19th, 2022)
+
+IMPROVEMENTS
+
+* Add support for fetching ARM Terraform binaries.
+
+## 1.21.0 (January 30th, 2022)
 
 IMPROVEMENTS
 
