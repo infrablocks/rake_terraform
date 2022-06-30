@@ -11,6 +11,8 @@ module RakeTerraform
       parameter :source_directory, required: true
       parameter :work_directory, required: true
 
+      parameter :environment, default: {}
+
       parameter :backend_config
 
       parameter :vars, default: {}

@@ -137,6 +137,30 @@ describe RakeTerraform::TaskSets::All do
       expect(rake_task.creator.no_color).to(be(false))
     end
 
+    it 'passes supplied value for environment when provided' do
+      environment = {
+        'SOME_ENV' => 'some-value'
+      }
+
+      namespace :network do
+        define_tasks(environment: environment)
+      end
+
+      rake_task = Rake::Task['network:validate']
+
+      expect(rake_task.creator.environment).to(be(environment))
+    end
+
+    it 'uses default for environment by default' do
+      namespace :network do
+        define_tasks
+      end
+
+      rake_task = Rake::Task['network:validate']
+
+      expect(rake_task.creator.environment).to(eq({}))
+    end
+
     it 'passes provided ensure task when present' do
       ensure_task_name = :'tooling:terraform:ensure'
 
@@ -409,6 +433,30 @@ describe RakeTerraform::TaskSets::All do
       expect(rake_task.creator.no_color).to(be(false))
     end
 
+    it 'passes supplied value for environment when provided' do
+      environment = {
+        'SOME_ENV' => 'some-value'
+      }
+
+      namespace :network do
+        define_tasks(environment: environment)
+      end
+
+      rake_task = Rake::Task['network:plan']
+
+      expect(rake_task.creator.environment).to(eq(environment))
+    end
+
+    it 'passes default for environment by default' do
+      namespace :network do
+        define_tasks
+      end
+
+      rake_task = Rake::Task['network:plan']
+
+      expect(rake_task.creator.environment).to(eq({}))
+    end
+
     it 'passes provided ensure task when present' do
       ensure_task_name = :'tooling:terraform:ensure'
 
@@ -654,6 +702,30 @@ describe RakeTerraform::TaskSets::All do
       rake_task = Rake::Task['network:provision']
 
       expect(rake_task.creator.no_color).to(be(false))
+    end
+
+    it 'passes supplied value for environment when provided' do
+      environment = {
+        'SOME_ENV' => 'some-value'
+      }
+
+      namespace :network do
+        define_tasks(environment: environment)
+      end
+
+      rake_task = Rake::Task['network:provision']
+
+      expect(rake_task.creator.environment).to(eq(environment))
+    end
+
+    it 'passes default for environment by default' do
+      namespace :network do
+        define_tasks
+      end
+
+      rake_task = Rake::Task['network:provision']
+
+      expect(rake_task.creator.environment).to(eq({}))
     end
 
     it 'passes supplied value for no_backup when provided' do
@@ -947,6 +1019,30 @@ describe RakeTerraform::TaskSets::All do
       expect(rake_task.creator.no_color).to(be(false))
     end
 
+    it 'passes supplied value for environment when provided' do
+      environment = {
+        'SOME_ENV' => 'some-value'
+      }
+
+      namespace :network do
+        define_tasks(environment: environment)
+      end
+
+      rake_task = Rake::Task['network:destroy']
+
+      expect(rake_task.creator.environment).to(eq(environment))
+    end
+
+    it 'passes default for environment by default' do
+      namespace :network do
+        define_tasks
+      end
+
+      rake_task = Rake::Task['network:destroy']
+
+      expect(rake_task.creator.environment).to(eq({}))
+    end
+
     it 'passes supplied value for no_backup when provided' do
       no_backup = true
 
@@ -1187,6 +1283,30 @@ describe RakeTerraform::TaskSets::All do
       rake_task = Rake::Task['network:output']
 
       expect(rake_task.creator.no_color).to(be(false))
+    end
+
+    it 'passes supplied value for environment when provided' do
+      environment = {
+        'SOME_ENV' => 'some-value'
+      }
+
+      namespace :network do
+        define_tasks(environment: environment)
+      end
+
+      rake_task = Rake::Task['network:output']
+
+      expect(rake_task.creator.environment).to(eq(environment))
+    end
+
+    it 'passes default for environment by default' do
+      namespace :network do
+        define_tasks
+      end
+
+      rake_task = Rake::Task['network:output']
+
+      expect(rake_task.creator.environment).to(eq({}))
     end
 
     it 'passes supplied value for no_print_output when provided' do
