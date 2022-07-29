@@ -469,7 +469,7 @@ RSpec.describe RakeTerraform do
         )
 
         expect(provider_task_sets[0].installation_directory)
-          .to(eq("#{ENV['HOME']}/.terraform.d/plugins"))
+          .to(eq("#{Dir.home}/.terraform.d/plugins"))
       end
 
       # TODO: test needs_fetch more thoroughly

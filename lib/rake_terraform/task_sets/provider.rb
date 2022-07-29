@@ -153,7 +153,7 @@ module RakeTerraform
       end
 
       def installation_directory
-        @installation_directory ||= "#{ENV['HOME']}/.terraform.d/plugins"
+        @installation_directory ||= "#{Dir.home}/.terraform.d/plugins"
       end
 
       def needs_fetch
