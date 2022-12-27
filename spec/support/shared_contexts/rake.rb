@@ -5,7 +5,7 @@ require 'active_support'
 require 'active_support/core_ext/string/inflections'
 
 shared_context 'with rake' do
-  include ::Rake::DSL if defined?(::Rake::DSL)
+  include Rake::DSL if defined?(Rake::DSL)
 
   subject { self.class.top_level_description.constantize }
 
