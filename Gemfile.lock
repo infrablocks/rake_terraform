@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rake_terraform (1.24.0.pre.3)
+    rake_terraform (1.24.0.pre.4)
       colored2 (~> 3.1)
       rake_dependencies (>= 3.5)
       rake_factory (~> 0.23)
@@ -192,4 +192,4 @@ DEPENDENCIES
   yard
 
 BUNDLED WITH
-   2.4.1
+   2.4.2
