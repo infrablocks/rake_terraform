@@ -33,3 +33,6 @@ RSpec/MultipleExpectations:
 
 Gemspec/RequireMFA:
   Enabled: false
+
+Gemspec/DevelopmentDependencies:
+  Enabled: false

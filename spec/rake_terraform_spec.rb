@@ -119,7 +119,6 @@ RSpec.describe RakeTerraform do
                  }))
       end
 
-      # rubocop:disable Naming/VariableNumber
       it 'uses the correct platform CPU names' do
         task_set, = described_class.define_installation_tasks
 
@@ -131,7 +130,6 @@ RSpec.describe RakeTerraform do
                    arm64: 'arm64'
                  }))
       end
-      # rubocop:enable Naming/VariableNumber
 
       it 'uses the correct URI template' do
         task_set, = described_class.define_installation_tasks
@@ -349,7 +347,6 @@ RSpec.describe RakeTerraform do
                  }))
       end
 
-      # rubocop:disable Naming/VariableNumber
       it 'passes the correct platform CPU names for golang binary defaults' do
         _, provider_task_sets = described_class.define_installation_tasks(
           {
@@ -374,7 +371,6 @@ RSpec.describe RakeTerraform do
                    arm64: 'arm64'
                  }))
       end
-      # rubocop:enable Naming/VariableNumber
 
       it 'constructs a github release URL based on the provided repository ' \
          'and name' do

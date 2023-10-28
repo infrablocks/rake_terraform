@@ -119,7 +119,6 @@ module RakeTerraform
         }
       end
 
-      # rubocop:disable Naming/VariableNumber
       def platform_cpu_names
         @platform_cpu_names ||= {
           x86_64: 'amd64',
@@ -128,7 +127,6 @@ module RakeTerraform
           arm64: 'arm64'
         }
       end
-      # rubocop:enable Naming/VariableNumber
 
       def uri_template
         @uri_template ||=
