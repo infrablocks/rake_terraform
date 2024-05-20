@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rake_terraform (1.24.0.pre.7)
+    rake_terraform (1.24.0.pre.8)
       colored2 (~> 3.1)
       rake_dependencies (= 3.6.0.pre.6)
       rake_factory (~> 0.23)
