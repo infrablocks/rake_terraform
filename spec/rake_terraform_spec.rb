@@ -127,7 +127,9 @@ RSpec.describe RakeTerraform do
                    x86_64: 'amd64',
                    x86: '386',
                    x64: 'amd64',
-                   arm64: 'arm64'
+                   arm: 'arm',
+                   arm64: 'arm64',
+                   aarch64: 'arm64'
                  }))
       end
 
@@ -368,7 +370,9 @@ RSpec.describe RakeTerraform do
                    x86_64: 'amd64',
                    x86: '386',
                    x64: 'amd64',
-                   arm64: 'arm64'
+                   arm: 'arm',
+                   arm64: 'arm64',
+                   aarch64: 'arm64'
                  }))
       end
 

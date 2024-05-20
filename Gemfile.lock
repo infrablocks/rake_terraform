@@ -3,7 +3,7 @@ PATH
   specs:
     rake_terraform (1.24.0.pre.8)
       colored2 (~> 3.1)
-      rake_dependencies (= 3.6.0.pre.6)
+      rake_dependencies (= 3.6.0.pre.7)
       rake_factory (~> 0.23)
       ruby-terraform (~> 1.4)
 
@@ -104,7 +104,7 @@ GEM
       excon (~> 0.72)
       rake_factory (~> 0.23)
       sshkey (~> 2.0)
-    rake_dependencies (3.6.0.pre.6)
+    rake_dependencies (3.6.0.pre.7)
       down (~> 5.3)
       hamster (~> 3.0)
       minitar (~> 0.9)
