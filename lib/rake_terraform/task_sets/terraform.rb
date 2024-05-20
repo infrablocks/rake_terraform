@@ -50,6 +50,8 @@ module RakeTerraform
 
           binary_directory: binary_directory,
 
+          logger: logger,
+
           needs_fetch: needs_fetch
         }
       end
@@ -124,7 +126,7 @@ module RakeTerraform
       end
 
       def needs_fetch
-        @needs_fetch ||= ->(_) { return !exists_with_correct_version?(binary) }
+        @needs_fetch ||= ->(_) { !exists_with_correct_version?(binary) }
       end
 
       def exists_with_correct_version?(binary)

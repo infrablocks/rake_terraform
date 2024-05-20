@@ -53,6 +53,8 @@ module RakeTerraform
 
           installation_directory: installation_directory,
 
+          logger: logger,
+
           needs_fetch: needs_fetch
         }
       end
@@ -155,7 +157,7 @@ module RakeTerraform
       end
 
       def needs_fetch
-        @needs_fetch ||= ->(_) { return !exist?(binary) }
+        @needs_fetch ||= ->(_) { !exist?(binary) }
       end
 
       def exist?(binary)
