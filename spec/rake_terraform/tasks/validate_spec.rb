@@ -116,7 +116,7 @@ describe RakeTerraform::Tasks::Validate do
     argument_names = %i[deployment_identifier region]
 
     namespace :infrastructure do
-      described_class.define(argument_names: argument_names) do |t|
+      described_class.define(argument_names:) do |t|
         t.configuration_name = 'network'
         t.source_directory = 'infra/network'
         t.work_directory = 'build'
@@ -359,7 +359,7 @@ describe RakeTerraform::Tasks::Validate do
 
     expect(RubyTerraform)
       .to(have_received(:init)
-            .with(anything, { environment: environment }))
+            .with(anything, { environment: }))
   end
 
   it 'passes the provided backend config to init when present' do
@@ -515,7 +515,7 @@ describe RakeTerraform::Tasks::Validate do
 
     expect(RubyTerraform)
       .to(have_received(:validate)
-            .with(anything, { environment: environment }))
+            .with(anything, { environment: }))
   end
 
   def stub_puts

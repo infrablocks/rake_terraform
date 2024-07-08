@@ -34,9 +34,9 @@ describe RakeTerraform::TaskSets::All do
 
       namespace :network do
         define_tasks(
-          configuration_name: configuration_name,
-          source_directory: source_directory,
-          work_directory: work_directory
+          configuration_name:,
+          source_directory:,
+          work_directory:
         )
       end
 
@@ -53,7 +53,7 @@ describe RakeTerraform::TaskSets::All do
       }
 
       namespace :network do
-        define_tasks(backend_config: backend_config)
+        define_tasks(backend_config:)
       end
 
       rake_task = Rake::Task['network:validate']
@@ -75,7 +75,7 @@ describe RakeTerraform::TaskSets::All do
       debug = true
 
       namespace :network do
-        define_tasks(debug: debug)
+        define_tasks(debug:)
       end
 
       rake_task = Rake::Task['network:validate']
@@ -97,7 +97,7 @@ describe RakeTerraform::TaskSets::All do
       input = true
 
       namespace :network do
-        define_tasks(input: input)
+        define_tasks(input:)
       end
 
       rake_task = Rake::Task['network:validate']
@@ -119,7 +119,7 @@ describe RakeTerraform::TaskSets::All do
       no_color = true
 
       namespace :network do
-        define_tasks(no_color: no_color)
+        define_tasks(no_color:)
       end
 
       rake_task = Rake::Task['network:validate']
@@ -143,7 +143,7 @@ describe RakeTerraform::TaskSets::All do
       }
 
       namespace :network do
-        define_tasks(environment: environment)
+        define_tasks(environment:)
       end
 
       rake_task = Rake::Task['network:validate']
@@ -165,7 +165,7 @@ describe RakeTerraform::TaskSets::All do
       ensure_task_name = :'tooling:terraform:ensure'
 
       namespace :network do
-        define_tasks(ensure_task_name: ensure_task_name)
+        define_tasks(ensure_task_name:)
       end
 
       rake_task = Rake::Task['network:validate']
@@ -210,7 +210,7 @@ describe RakeTerraform::TaskSets::All do
     it 'passes the provided argument names when supplied' do
       argument_names = %i[deployment_identifier region]
 
-      define_tasks(argument_names: argument_names)
+      define_tasks(argument_names:)
 
       rake_task = Rake::Task['validate']
 
@@ -239,9 +239,9 @@ describe RakeTerraform::TaskSets::All do
 
       namespace :network do
         define_tasks(
-          configuration_name: configuration_name,
-          source_directory: source_directory,
-          work_directory: work_directory
+          configuration_name:,
+          source_directory:,
+          work_directory:
         )
       end
 
@@ -258,7 +258,7 @@ describe RakeTerraform::TaskSets::All do
       }
 
       namespace :network do
-        define_tasks(backend_config: backend_config)
+        define_tasks(backend_config:)
       end
 
       rake_task = Rake::Task['network:plan']
@@ -283,7 +283,7 @@ describe RakeTerraform::TaskSets::All do
       }
 
       namespace :network do
-        define_tasks(vars: vars)
+        define_tasks(vars:)
       end
 
       rake_task = Rake::Task['network:plan']
@@ -305,7 +305,7 @@ describe RakeTerraform::TaskSets::All do
       var_file = 'some/terraform.tfvars'
 
       namespace :network do
-        define_tasks(var_file: var_file)
+        define_tasks(var_file:)
       end
 
       rake_task = Rake::Task['network:plan']
@@ -327,7 +327,7 @@ describe RakeTerraform::TaskSets::All do
       state_file = 'infra/terraform.tfstate'
 
       namespace :network do
-        define_tasks(state_file: state_file)
+        define_tasks(state_file:)
       end
 
       rake_task = Rake::Task['network:plan']
@@ -349,7 +349,7 @@ describe RakeTerraform::TaskSets::All do
       plan_file = 'infra/terraform.tfplan'
 
       namespace :network do
-        define_tasks(plan_file: plan_file)
+        define_tasks(plan_file:)
       end
 
       rake_task = Rake::Task['network:plan']
@@ -371,7 +371,7 @@ describe RakeTerraform::TaskSets::All do
       debug = true
 
       namespace :network do
-        define_tasks(debug: debug)
+        define_tasks(debug:)
       end
 
       rake_task = Rake::Task['network:plan']
@@ -393,7 +393,7 @@ describe RakeTerraform::TaskSets::All do
       input = true
 
       namespace :network do
-        define_tasks(input: input)
+        define_tasks(input:)
       end
 
       rake_task = Rake::Task['network:plan']
@@ -415,7 +415,7 @@ describe RakeTerraform::TaskSets::All do
       no_color = true
 
       namespace :network do
-        define_tasks(no_color: no_color)
+        define_tasks(no_color:)
       end
 
       rake_task = Rake::Task['network:plan']
@@ -439,7 +439,7 @@ describe RakeTerraform::TaskSets::All do
       }
 
       namespace :network do
-        define_tasks(environment: environment)
+        define_tasks(environment:)
       end
 
       rake_task = Rake::Task['network:plan']
@@ -461,7 +461,7 @@ describe RakeTerraform::TaskSets::All do
       ensure_task_name = :'tooling:terraform:ensure'
 
       namespace :network do
-        define_tasks(ensure_task_name: ensure_task_name)
+        define_tasks(ensure_task_name:)
       end
 
       rake_task = Rake::Task['network:plan']
@@ -529,9 +529,9 @@ describe RakeTerraform::TaskSets::All do
 
       namespace :network do
         define_tasks(
-          configuration_name: configuration_name,
-          source_directory: source_directory,
-          work_directory: work_directory
+          configuration_name:,
+          source_directory:,
+          work_directory:
         )
       end
 
@@ -551,7 +551,7 @@ describe RakeTerraform::TaskSets::All do
       }
 
       namespace :network do
-        define_tasks(backend_config: backend_config)
+        define_tasks(backend_config:)
       end
 
       rake_task = Rake::Task['network:provision']
@@ -576,7 +576,7 @@ describe RakeTerraform::TaskSets::All do
       }
 
       namespace :network do
-        define_tasks(vars: vars)
+        define_tasks(vars:)
       end
 
       rake_task = Rake::Task['network:provision']
@@ -598,7 +598,7 @@ describe RakeTerraform::TaskSets::All do
       var_file = 'some/terraform.tfvars'
 
       namespace :network do
-        define_tasks(var_file: var_file)
+        define_tasks(var_file:)
       end
 
       rake_task = Rake::Task['network:provision']
@@ -620,7 +620,7 @@ describe RakeTerraform::TaskSets::All do
       state_file = 'infra/terraform.tfstate'
 
       namespace :network do
-        define_tasks(state_file: state_file)
+        define_tasks(state_file:)
       end
 
       rake_task = Rake::Task['network:provision']
@@ -642,7 +642,7 @@ describe RakeTerraform::TaskSets::All do
       debug = true
 
       namespace :network do
-        define_tasks(debug: debug)
+        define_tasks(debug:)
       end
 
       rake_task = Rake::Task['network:provision']
@@ -664,7 +664,7 @@ describe RakeTerraform::TaskSets::All do
       input = true
 
       namespace :network do
-        define_tasks(input: input)
+        define_tasks(input:)
       end
 
       rake_task = Rake::Task['network:provision']
@@ -686,7 +686,7 @@ describe RakeTerraform::TaskSets::All do
       no_color = true
 
       namespace :network do
-        define_tasks(no_color: no_color)
+        define_tasks(no_color:)
       end
 
       rake_task = Rake::Task['network:provision']
@@ -710,7 +710,7 @@ describe RakeTerraform::TaskSets::All do
       }
 
       namespace :network do
-        define_tasks(environment: environment)
+        define_tasks(environment:)
       end
 
       rake_task = Rake::Task['network:provision']
@@ -732,7 +732,7 @@ describe RakeTerraform::TaskSets::All do
       no_backup = true
 
       namespace :network do
-        define_tasks(no_backup: no_backup)
+        define_tasks(no_backup:)
       end
 
       rake_task = Rake::Task['network:provision']
@@ -754,7 +754,7 @@ describe RakeTerraform::TaskSets::All do
       backup_file = 'infra/terraform.tfstate.backup'
 
       namespace :network do
-        define_tasks(backup_file: backup_file)
+        define_tasks(backup_file:)
       end
 
       rake_task = Rake::Task['network:provision']
@@ -776,7 +776,7 @@ describe RakeTerraform::TaskSets::All do
       ensure_task_name = :'tooling:terraform:ensure'
 
       namespace :network do
-        define_tasks(ensure_task_name: ensure_task_name)
+        define_tasks(ensure_task_name:)
       end
 
       rake_task = Rake::Task['network:provision']
@@ -844,9 +844,9 @@ describe RakeTerraform::TaskSets::All do
 
       namespace :network do
         define_tasks(
-          configuration_name: configuration_name,
-          source_directory: source_directory,
-          work_directory: work_directory
+          configuration_name:,
+          source_directory:,
+          work_directory:
         )
       end
 
@@ -866,7 +866,7 @@ describe RakeTerraform::TaskSets::All do
       }
 
       namespace :network do
-        define_tasks(backend_config: backend_config)
+        define_tasks(backend_config:)
       end
 
       rake_task = Rake::Task['network:destroy']
@@ -891,7 +891,7 @@ describe RakeTerraform::TaskSets::All do
       }
 
       namespace :network do
-        define_tasks(vars: vars)
+        define_tasks(vars:)
       end
 
       rake_task = Rake::Task['network:destroy']
@@ -913,7 +913,7 @@ describe RakeTerraform::TaskSets::All do
       var_file = 'some/terraform.tfvars'
 
       namespace :network do
-        define_tasks(var_file: var_file)
+        define_tasks(var_file:)
       end
 
       rake_task = Rake::Task['network:destroy']
@@ -935,7 +935,7 @@ describe RakeTerraform::TaskSets::All do
       state_file = 'infra/terraform.tfstate'
 
       namespace :network do
-        define_tasks(state_file: state_file)
+        define_tasks(state_file:)
       end
 
       rake_task = Rake::Task['network:destroy']
@@ -957,7 +957,7 @@ describe RakeTerraform::TaskSets::All do
       debug = true
 
       namespace :network do
-        define_tasks(debug: debug)
+        define_tasks(debug:)
       end
 
       rake_task = Rake::Task['network:destroy']
@@ -979,7 +979,7 @@ describe RakeTerraform::TaskSets::All do
       input = true
 
       namespace :network do
-        define_tasks(input: input)
+        define_tasks(input:)
       end
 
       rake_task = Rake::Task['network:destroy']
@@ -1001,7 +1001,7 @@ describe RakeTerraform::TaskSets::All do
       no_color = true
 
       namespace :network do
-        define_tasks(no_color: no_color)
+        define_tasks(no_color:)
       end
 
       rake_task = Rake::Task['network:destroy']
@@ -1025,7 +1025,7 @@ describe RakeTerraform::TaskSets::All do
       }
 
       namespace :network do
-        define_tasks(environment: environment)
+        define_tasks(environment:)
       end
 
       rake_task = Rake::Task['network:destroy']
@@ -1047,7 +1047,7 @@ describe RakeTerraform::TaskSets::All do
       no_backup = true
 
       namespace :network do
-        define_tasks(no_backup: no_backup)
+        define_tasks(no_backup:)
       end
 
       rake_task = Rake::Task['network:destroy']
@@ -1069,7 +1069,7 @@ describe RakeTerraform::TaskSets::All do
       backup_file = 'infra/terraform.tfstate.backup'
 
       namespace :network do
-        define_tasks(backup_file: backup_file)
+        define_tasks(backup_file:)
       end
 
       rake_task = Rake::Task['network:destroy']
@@ -1091,7 +1091,7 @@ describe RakeTerraform::TaskSets::All do
       ensure_task_name = :'tooling:terraform:ensure'
 
       namespace :network do
-        define_tasks(ensure_task_name: ensure_task_name)
+        define_tasks(ensure_task_name:)
       end
 
       rake_task = Rake::Task['network:destroy']
@@ -1160,9 +1160,9 @@ describe RakeTerraform::TaskSets::All do
 
       namespace :network do
         define_tasks(
-          configuration_name: configuration_name,
-          source_directory: source_directory,
-          work_directory: work_directory
+          configuration_name:,
+          source_directory:,
+          work_directory:
         )
       end
 
@@ -1179,7 +1179,7 @@ describe RakeTerraform::TaskSets::All do
       }
 
       namespace :network do
-        define_tasks(backend_config: backend_config)
+        define_tasks(backend_config:)
       end
 
       rake_task = Rake::Task['network:output']
@@ -1201,7 +1201,7 @@ describe RakeTerraform::TaskSets::All do
       state_file = 'infra/terraform.tfstate'
 
       namespace :network do
-        define_tasks(state_file: state_file)
+        define_tasks(state_file:)
       end
 
       rake_task = Rake::Task['network:output']
@@ -1223,7 +1223,7 @@ describe RakeTerraform::TaskSets::All do
       debug = true
 
       namespace :network do
-        define_tasks(debug: debug)
+        define_tasks(debug:)
       end
 
       rake_task = Rake::Task['network:output']
@@ -1245,7 +1245,7 @@ describe RakeTerraform::TaskSets::All do
       input = true
 
       namespace :network do
-        define_tasks(input: input)
+        define_tasks(input:)
       end
 
       rake_task = Rake::Task['network:output']
@@ -1267,7 +1267,7 @@ describe RakeTerraform::TaskSets::All do
       no_color = true
 
       namespace :network do
-        define_tasks(no_color: no_color)
+        define_tasks(no_color:)
       end
 
       rake_task = Rake::Task['network:output']
@@ -1291,7 +1291,7 @@ describe RakeTerraform::TaskSets::All do
       }
 
       namespace :network do
-        define_tasks(environment: environment)
+        define_tasks(environment:)
       end
 
       rake_task = Rake::Task['network:output']
@@ -1313,7 +1313,7 @@ describe RakeTerraform::TaskSets::All do
       no_print_output = true
 
       namespace :network do
-        define_tasks(no_print_output: no_print_output)
+        define_tasks(no_print_output:)
       end
 
       rake_task = Rake::Task['network:output']
@@ -1335,7 +1335,7 @@ describe RakeTerraform::TaskSets::All do
       ensure_task_name = :'tooling:terraform:ensure'
 
       namespace :network do
-        define_tasks(ensure_task_name: ensure_task_name)
+        define_tasks(ensure_task_name:)
       end
 
       rake_task = Rake::Task['network:output']

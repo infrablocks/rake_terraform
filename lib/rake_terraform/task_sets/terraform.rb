@@ -13,11 +13,11 @@ module RakeTerraform
 
       attr_reader :delegate
 
-      def initialize(*args, &configuration_block)
+      def initialize(*args, &)
         @opts = args[0]
         @delegate =
           RakeDependencies::TaskSets::All.new(
-            task_set_opts, &configuration_block
+            task_set_opts, &
           )
       end
 
@@ -36,23 +36,23 @@ module RakeTerraform
 
       def task_set_opts
         {
-          namespace: namespace,
-          dependency: dependency,
-          version: version,
-          path: path,
-          type: type,
+          namespace:,
+          dependency:,
+          version:,
+          path:,
+          type:,
 
-          platform_os_names: platform_os_names,
-          platform_cpu_names: platform_cpu_names,
+          platform_os_names:,
+          platform_cpu_names:,
 
-          uri_template: uri_template,
-          file_name_template: file_name_template,
+          uri_template:,
+          file_name_template:,
 
-          binary_directory: binary_directory,
+          binary_directory:,
 
-          logger: logger,
+          logger:,
 
-          needs_fetch: needs_fetch
+          needs_fetch:
         }
       end
 
