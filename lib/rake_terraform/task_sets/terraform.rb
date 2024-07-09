@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rake'
+require 'tempfile'
 
 module RakeTerraform
   module TaskSets
@@ -142,17 +143,20 @@ module RakeTerraform
       end
 
       def correct_version?(binary)
-        result = StringIO.new
+        result = Tempfile.new
         command = version_command(binary)
 
         log_version_lookup(command)
 
         command.execute(stdout: result)
 
-        log_version_information(result)
-        log_check_outcome(result)
+        result.rewind
+        output = result.read
 
-        contains_version_number?(result)
+        log_version_information(output)
+        log_check_outcome(output)
+
+        contains_version_number?(output)
       end
 
       def version_command(binary)
@@ -173,25 +177,25 @@ module RakeTerraform
         )
       end
 
-      def log_version_information(result)
+      def log_version_information(output)
         logger.info(
-          "Terraform version information is: \n#{result.string}"
+          "Terraform version information is: \n#{output}"
         )
       end
 
-      def log_check_outcome(result)
+      def log_check_outcome(output)
         logger.debug(
           "Version: '#{version}' is in version line: " \
-          "'#{version_line(result)}'?: #{contains_version_number?(result)}"
+          "'#{version_line(output)}'?: #{contains_version_number?(output)}"
         )
       end
 
-      def version_line(result)
-        result.string.lines.first
+      def version_line(output)
+        output.string.lines.first
       end
 
-      def contains_version_number?(result)
-        version_line(result) =~ /#{version}/
+      def contains_version_number?(output)
+        version_line(output) =~ /#{version}/
       end
     end
 
