@@ -191,7 +191,7 @@ module RakeTerraform
       end
 
       def version_line(output)
-        output.string.lines.first
+        output.lines.first
       end
 
       def contains_version_number?(output)
