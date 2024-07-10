@@ -5,7 +5,7 @@ PATH
       colored2 (~> 3.1)
       rake_dependencies (= 3.6.0.pre.7)
       rake_factory (~> 0.23)
-      ruby-terraform (= 1.8.0.pre.9)
+      ruby-terraform (= 1.8.0.pre.10)
 
 GEM
   remote: https://rubygems.org/
@@ -177,7 +177,7 @@ GEM
     rubocop-rspec (3.0.2)
       rubocop (~> 1.61)
     ruby-progressbar (1.13.0)
-    ruby-terraform (1.8.0.pre.9)
+    ruby-terraform (1.8.0.pre.10)
       immutable-struct (~> 2.4)
       lino (= 3.2.0.pre.10)
     ruby_git_crypt (0.1.0.pre.4)
