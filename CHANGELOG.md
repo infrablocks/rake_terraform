@@ -1,5 +1,11 @@
 ## Unreleased
 
+## 1.24.0 (July 17th, 2024)
+
+IMPROVEMENTS
+
+* Upgrade to latest ruby_terraform, adding Microsoft Windows support.
+
 ## 1.23.0 (June 30th, 2022)
 
 IMPROVEMENTS
