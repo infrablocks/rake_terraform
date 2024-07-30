@@ -109,7 +109,7 @@ GEM
       excon (~> 0.72)
       rake_factory (~> 0.23)
       sshkey (~> 2.0)
-    rake_dependencies (3.7.0)
+    rake_dependencies (3.9.0)
       down (~> 5.3)
       hamster (~> 3.0)
       minitar (~> 0.9)
